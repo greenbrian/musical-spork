@@ -7,3 +7,8 @@
 
 # .tfvars files
 *.tfvars
+
+# other bits
+notes
+packer/vars.json
+private_key.pem

@@ -1,0 +1,102 @@
+{
+  "variables": {
+    "aws_access_key_id": "{{ env `AWS_ACCESS_KEY_ID` }}",
+    "aws_secret_access_key": "{{ env `AWS_SECRET_ACCESS_KEY` }}",
+    "aws_region": "{{ env `AWS_REGION` }}"
+  },
+  "builders": [
+    {
+      "name": "amazon-ebs-ubuntu-18.04-systemd",
+      "type": "amazon-ebs",
+      "access_key": "{{ user `aws_access_key_id` }}",
+      "secret_key": "{{ user `aws_secret_access_key` }}",
+      "region": "{{ user `aws_region` }}",
+      "spot_price_auto_product": "Linux/UNIX (Amazon VPC)",
+      "force_deregister": true,
+      "force_delete_snapshot": true,
+      "ssh_pty": true,
+      "instance_type": "t2.medium",
+      "associate_public_ip_address": true,
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "*ubuntu-bionic-18.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["099720109477"],
+        "most_recent": true
+      },
+      "ssh_username": "ubuntu",
+      "ssh_timeout": "10m",
+      "ami_virtualization_type": "hvm",
+      "ami_name": "hashistack-image-{{isotime \"2006-01-02-03-04\"}}",
+      "ami_description": "HashiStack Image Ubuntu 18.04",
+      "ami_regions": ["us-east-1", "us-east-2", "us-west-2"],
+      "tags": {
+        "Name": "HashiStack Ubuntu 18.04 Image Consul v{{ user `consul_version` }} Vault v{{ user `vault_version` }} Nomad v{{ user `nomad_version` }}",
+        "System": "HashiStack",
+        "Product": "HashiStack",
+        "Consul-Version": "{{ user `consul_version` }}",
+        "Vault-Version": "{{ user `vault_version` }}",
+        "Nomad-Version": "{{ user `nomad_version` }}",
+        "OS": "ubuntu",
+        "OS-Version": "18.04"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "{{ user `consul_zip` }}",
+      "destination": "/tmp/consul.zip"
+    },
+    {
+      "type": "file",
+      "source": "{{ user `consul_template_zip` }}",
+      "destination": "/tmp/consul-template.zip"
+    },
+    {
+      "type": "file",
+      "source": "{{ user `nomad_zip` }}",
+      "destination": "/tmp/nomad.zip"
+    },
+    {
+      "type": "file",
+      "source": "{{ user `vault_zip` }}",
+      "destination": "/tmp/vault.zip"
+    },
+    {
+      "type": "file",
+      "source": "files",
+      "destination": "/tmp"
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'packer' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+        "inline": [
+           "sudo useradd -m {{user `username`}} -s /bin/bash",
+           "sudo mkdir -p /home/{{user `username`}}/.ssh/",
+           "sudo echo \"{{user `username`}} ALL=(root) NOPASSWD: ALL\" >> /etc/sudoers.d/{{user `username`}}"
+            ]
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'packer' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+        "inline": [
+           "echo {{user `pubkey`}} > /tmp/authorized_keys",
+           "sudo mv /tmp/authorized_keys /home/{{user `username`}}/.ssh/authorized_keys",
+           "sudo chown -R {{user `username`}}:{{user `username`}} /home/{{user `username`}}/.ssh/",
+           "sudo chmod 700 /home/{{user `username`}}/.ssh/",
+           "sudo chmod 600 /home/{{user `username`}}/.ssh/authorized_keys"
+            ]
+    },
+    {
+      "type": "shell",
+      "script": "scripts/setup.sh"
+    },
+    {
+      "type": "shell",
+      "script": "scripts/cleanup.sh"
+    }
+  ]
+}

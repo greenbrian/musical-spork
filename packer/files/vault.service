@@ -1,0 +1,18 @@
+[Unit]
+Description=Vault Agent
+Requires=consul-online.target
+After=consul-online.target
+
+[Service]
+Restart=on-failure
+PermissionsStartOnly=true
+ExecStartPre=/sbin/setcap 'cap_ipc_lock=+ep' /usr/local/bin/vault
+ExecStart=/usr/local/bin/vault server -config /etc/vault.d
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+User=vault
+Group=vault
+LimitMEMLOCK=infinity
+
+[Install]
+WantedBy=multi-user.target

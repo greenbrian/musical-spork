@@ -1,0 +1,10 @@
+{
+  "consul_zip": "/path/to/consul-enterprise_1.1.0+ent_linux_amd64.zip",
+  "consul_version": "1.1.0",
+  "consul_template_zip": "/path/to/consul-template_0.19.4_linux_amd64.zip",
+  "consul_template_version": "0.19.4",
+  "nomad_zip": "/path/to/nomad-enterprise_0.8.3+ent_linux_amd64.zip",
+  "nomad_version": "0.8.3",
+  "vault_zip": "/path/to/vault-enterprise_0.10.1+prem_linux_amd64.zip",
+  "vault_version": "0.10.1"
+}
