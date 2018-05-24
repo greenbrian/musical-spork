@@ -1,3 +1,22 @@
 owner    = "John Doe"
 ttl      = "24"
 env_name = "hashistack"
+
+# automatically initialize and unseal vault clusters 
+# during terraform execution
+vault_cloud_auto_init_and_unseal   = true
+
+
+
+## UNDER CONSTRUCTION
+# automatically setup vault replication 
+# during terraform execution
+vault_auto_replication_setup = true
+
+## UNDER CONSTRUCTION
+# enable nomad clusters
+nomad_enabled                = true
+
+## UNDER CONSTRUCTION
+# use kms key for auto unseal
+vault_cloud_unseal           = true

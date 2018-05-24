@@ -13,9 +13,23 @@ variable "subnet_ids" {
   type = "list"
 }
 
+variable "remote_regions" {
+  type = "list"
+}
+
 variable "instance_type" {
   default     = "t2.micro"
   description = "AWS instance type to use eg m4.large"
+}
+
+variable "vault_cloud_auto_init_and_unseal" {
+  type        = "string"
+  description = "Enable or disable automatic Vault initialization and unseal. True or false, string."
+}
+
+variable "vault_auto_replication_setup" {
+  type        = "string"
+  description = "Enable or disable automatic replication configuration between Vault clusters. True or false, string."
 }
 
 output "ssh_info" {

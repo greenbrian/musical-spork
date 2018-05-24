@@ -54,9 +54,12 @@ data "template_file" "admin" {
   template = "${file("${path.module}/init-admin.tpl")}"
 
   vars = {
-    environment_name = "${var.environment_name}"
-    local_region     = "${var.region}"
-    private_key      = "${var.private_key_data}"
+    environment_name                 = "${var.environment_name}"
+    local_region                     = "${var.region}"
+    private_key                      = "${var.private_key_data}"
+    remote_regions                   = "${join(" ", var.remote_regions)}"
+    vault_cloud_auto_init_and_unseal = "${var.vault_cloud_auto_init_and_unseal}"
+    vault_auto_replication_setup     = "${var.vault_auto_replication_setup}"
   }
 }
 
