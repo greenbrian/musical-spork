@@ -7,4 +7,6 @@
   "nomad_version": "0.8.3",
   "vault_zip": "/path/to/vault-enterprise_0.10.1+prem_linux_amd64.zip",
   "vault_version": "0.10.1"
+  "username": "your-ssh-username",
+  "pubkey": "ssh-rsa AAAAB3NzaC1<<-- your public key goes here -->>IUzu4eGeAvSvdp/QFBtPoR37bLv"
 }
