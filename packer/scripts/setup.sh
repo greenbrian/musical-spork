@@ -100,5 +100,5 @@ sudo /usr/sbin/usermod --shell /bin/bash consul >/dev/null
 
 echo "Allow consul sudo access for echo, tee, cat, sed, and systemctl"
 cat <<SUDOERS | sudo tee /etc/sudoers.d/consul
-consul ALL=(ALL) NOPASSWD: /usr/bin/echo, /usr/bin/tee, /usr/bin/cat, /usr/bin/sed, /usr/bin/systemctl
+consul ALL=(ALL) NOPASSWD: /usr/bin/echo, /usr/bin/tee, /usr/bin/cat, /usr/bin/sed, /usr/bin/systemctl, /bin/systemctl
 SUDOERS

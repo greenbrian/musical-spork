@@ -31,25 +31,26 @@ ui=true
 EOF
 
 cat <<EOF>> /etc/consul.d/consul.hcl
-datacenter         = "${local_region}"
-server             = true
-bootstrap_expect   = ${cluster_size}
-leave_on_terminate = true
-advertise_addr     = "$${local_ipv4}"
-data_dir           = "/opt/consul/data"
-client_addr        = "0.0.0.0"
-log_level          = "INFO"
-ui                 = true
-retry_join         = ["provider=aws tag_key=Environment-Name tag_value=${environment_name}"]
-retry_join_wan     = [ ${wan_join} ]
+datacenter          = "${local_region}"
+server              = true
+bootstrap_expect    = ${cluster_size}
+leave_on_terminate  = true
+advertise_addr      = "$${local_ipv4}"
+data_dir            = "/opt/consul/data"
+client_addr         = "0.0.0.0"
+log_level           = "INFO"
+ui                  = true
+retry_join          = ["provider=aws tag_key=Environment-Name tag_value=${environment_name}"]
+retry_join_wan      = [ ${wan_join} ]
+disable_remote_exec = false
 EOF
 
 chown consul:consul /etc/consul.d/consul.hcl
 systemctl start consul
 
 cat <<EOF>> /etc/nomad.d/nomad.hcl
-datacenter = \"${local_region}\"
-region = \"${nomad_region}\"
+datacenter = "${local_region}"
+region = "${nomad_region}"
 data_dir     = "/opt/nomad/data"
 log_level    = "INFO"
 enable_debug = true
@@ -61,9 +62,9 @@ server {
 }
 
 advertise {
-  http = \"$${local_ipv4}\"
-  rpc  = \"$${local_ipv4}\"
-  serf = \"$${local_ipv4}\"
+  http = "$${local_ipv4}"
+  rpc  = "$${local_ipv4}"
+  serf = "$${local_ipv4}"
 }
 consul {
   address        = "127.0.0.1:8500"

@@ -106,31 +106,19 @@ module "hashistack-us-west" {
 }
 
 module "admin-east" {
-  source           = "./admin"
-  owner            = "${var.owner}"
-  ttl              = "${var.ttl}"
-  region           = "us-east-1"
-  cluster_name     = "${random_id.environment_name.hex}-us-east-1"
-  environment_name = "${random_id.environment_name.hex}"
-  ssh_key_name     = "${random_id.environment_name.hex}-admin"
-  instance_profile = "${module.hashistack-instance-profile.policy}"
-  public_key_data  = "${module.ssh.public_key_data}"
-  private_key_data = "${module.ssh.private_key_data}"
-  subnet_ids       = "${module.vpc-east.public_subnets}"
-  vpc_id           = "${module.vpc-east.vpc_id}"
-}
-
-module "admin-west" {
-  source           = "./admin"
-  owner            = "${var.owner}"
-  ttl              = "${var.ttl}"
-  region           = "us-west-2"
-  cluster_name     = "${random_id.environment_name.hex}-us-west-2"
-  environment_name = "${random_id.environment_name.hex}"
-  ssh_key_name     = "${random_id.environment_name.hex}-admin"
-  instance_profile = "${module.hashistack-instance-profile.policy}"
-  public_key_data  = "${module.ssh.public_key_data}"
-  private_key_data = "${module.ssh.private_key_data}"
-  subnet_ids       = "${module.vpc-west.public_subnets}"
-  vpc_id           = "${module.vpc-west.vpc_id}"
+  source                           = "./admin"
+  owner                            = "${var.owner}"
+  ttl                              = "${var.ttl}"
+  region                           = "us-east-1"
+  cluster_name                     = "${random_id.environment_name.hex}-us-east-1"
+  environment_name                 = "${random_id.environment_name.hex}"
+  remote_regions                   = ["us-west-2"]
+  ssh_key_name                     = "${random_id.environment_name.hex}-admin"
+  instance_profile                 = "${module.hashistack-instance-profile.policy}"
+  public_key_data                  = "${module.ssh.public_key_data}"
+  private_key_data                 = "${module.ssh.private_key_data}"
+  subnet_ids                       = "${module.vpc-east.public_subnets}"
+  vpc_id                           = "${module.vpc-east.vpc_id}"
+  vault_cloud_auto_init_and_unseal = "${var.vault_cloud_auto_init_and_unseal}"
+  vault_auto_replication_setup     = "${var.vault_auto_replication_setup}"
 }
