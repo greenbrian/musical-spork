@@ -85,6 +85,8 @@ module "hashistack-us-east" {
   public_subnet_ids = "${module.vpc-east.public_subnets}"
   vpc_id            = "${module.vpc-east.vpc_id}"
   kms_id            = "${aws_kms_key.vault.key_id}"
+  ssh_user_name     = "${var.ssh_user_name}"
+  operating_system  = "${var.operating_system}"
 }
 
 module "hashistack-us-west" {
@@ -103,6 +105,8 @@ module "hashistack-us-west" {
   public_subnet_ids = "${module.vpc-west.public_subnets}"
   vpc_id            = "${module.vpc-west.vpc_id}"
   kms_id            = "${aws_kms_key.vault.key_id}"
+  ssh_user_name     = "${var.ssh_user_name}"
+  operating_system  = "${var.operating_system}"
 }
 
 module "admin-east" {
@@ -121,4 +125,6 @@ module "admin-east" {
   vpc_id                           = "${module.vpc-east.vpc_id}"
   vault_cloud_auto_init_and_unseal = "${var.vault_cloud_auto_init_and_unseal}"
   vault_auto_replication_setup     = "${var.vault_auto_replication_setup}"
+  ssh_user_name                    = "${var.ssh_user_name}"
+  operating_system                 = "${var.operating_system}"
 }

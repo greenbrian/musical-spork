@@ -6,6 +6,11 @@ data aws_ami "hashistack" {
   most_recent = true
   owners      = ["self"]
   name_regex  = "hashistack-image-.*"
+
+  filter {
+    name   = "tag:OS"
+    values = ["${var.operating_system}"]
+  }
 }
 
 resource "aws_key_pair" "main" {
@@ -24,6 +29,7 @@ data "template_file" "init" {
     nomad_region     = "${substr(var.region, 0, 7 )}"
     private_key      = "${var.private_key_data}"
     kms_id           = "${var.kms_id}"
+    ssh_user_name    = "${var.ssh_user_name}"
   }
 }
 

@@ -4,7 +4,8 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-Restart=on-failure
+Restart=always
+RestartSec=5
 Environment=CONSUL_UI_BETA=1
 ExecStart=/usr/local/bin/consul agent -config-dir /etc/consul.d 
 ExecReload=/bin/kill -HUP $MAINPID
