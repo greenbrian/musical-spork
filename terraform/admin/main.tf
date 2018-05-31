@@ -6,6 +6,16 @@ data aws_ami "hashistack" {
   most_recent = true
   owners      = ["self"]
   name_regex  = "hashistack-image-.*"
+
+  filter {
+    name   = "tag:OS"
+    values = ["${var.operating_system}"]
+  }
+
+  filter {
+    name   = "tag:OS-Version"
+    values = ["${var.operating_system_version}"]
+  }
 }
 
 resource "aws_key_pair" "main" {
@@ -31,11 +41,11 @@ resource "aws_instance" "admin" {
 
   provisioner "file" {
     source      = "${path.module}/nomad"
-    destination = "/home/ubuntu"
+    destination = "/home/${var.ssh_user_name}"
 
     connection {
       type        = "ssh"
-      user        = "ubuntu"
+      user        = "${var.ssh_user_name}"
       private_key = "${var.private_key_data}"
     }
   }
@@ -60,14 +70,16 @@ data "template_file" "admin" {
     remote_regions                   = "${join(" ", var.remote_regions)}"
     vault_cloud_auto_init_and_unseal = "${var.vault_cloud_auto_init_and_unseal}"
     vault_auto_replication_setup     = "${var.vault_auto_replication_setup}"
+    ssh_user_name                    = "${var.ssh_user_name}"
   }
 }
 
 data "template_file" "format_ssh" {
-  template = "connect to host with following command: ssh ubuntu@$${admin} -i private_key.pem"
+  template = "connect to host with following command: ssh $${user}@$${admin} -i private_key.pem"
 
   vars {
     admin = "${aws_instance.admin.public_ip}"
+    user  = "${var.ssh_user_name}"
   }
 }
 

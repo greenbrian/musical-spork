@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
 set -x
 
-echo "Running"
-echo "Installing base packages"
-sudo apt-get -qq -y update
-sudo apt-get install -qq -y awscli jq telnet vim wget unzip ntp git dnsmasq default-jdk
+# Detect package management system.
+YUM=$(which yum 2>/dev/null)
+APT_GET=$(which apt-get 2>/dev/null)
+
+echo "Installing jq"
+sudo curl --silent -Lo /bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+sudo chmod +x /bin/jq
+
+echo "Configuring Docker options and service"
+sudo sh -c "echo \"DOCKER_OPTS='--dns 127.0.0.1 --dns 8.8.8.8 --dns-search service.consul'\" >> /etc/default/docker"
+
+sudo systemctl enable docker
+sudo systemctl start docker
 
 echo "Configuring system time"
 sudo timedatectl set-timezone UTC
-sudo systemctl start ntp.service
-sudo systemctl enable ntp.service
-
-echo "Disable reverse dns lookup in SSH"
-sudo sh -c 'echo "\nUseDNS no" >> /etc/ssh/sshd_config'
-sudo service ssh restart
 
 echo "Update resolv.conf"
 sudo sed -i '1i nameserver 127.0.0.1\n' /etc/resolv.conf
@@ -25,27 +28,6 @@ EOF
 
 echo "Enable DNSmasq"
 sudo systemctl enable dnsmasq
-
-echo "Disable firewall"
-sudo ufw disable
-
-echo "Adding Consul and Vault users"
-# nomad runs as root
-for _user in consul consul-template vault; do
-  sudo addgroup --system ${_user} >/dev/null
-  sudo adduser \
-    --system \
-    --disabled-login \
-    --ingroup ${_user} \
-    --home /srv/${_user} \
-    --no-create-home \
-    --gecos "${_user} account" \
-    --shell /bin/false \
-    ${_user}  >/dev/null
-sudo mkdir -pm 0755 /srv/${_user}
-sudo chown -R ${_user}:${_user} /srv/${_user}
-sudo chmod -R 0755 /srv/${_user}
-done
 
 echo "Installing Consul, Consul-template, Nomad and Vault"
 install_from_zip() {
@@ -66,26 +48,32 @@ install_from_zip consul-template
 install_from_zip nomad
 install_from_zip vault
 
+
 echo "Copy systemd services"
+echo "Determine OS type"
+if [[ ! -z ${YUM} ]]; then
+  SYSTEMD_DIR="/etc/systemd/system"
+elif [[ ! -z ${APT_GET} ]]; then
+  echo "Debian/Ubuntu system detected"
+  SYSTEMD_DIR="/lib/systemd/system"
+else
+  echo "OS detection failure"
+  exit 1;
+fi
+
 systemd_files() {
-  sudo cp /tmp/files/$1 /lib/systemd/system/
-  sudo chmod 0664 /lib/systemd/system/$1
+  sudo cp /tmp/files/$1 $2
+  sudo chmod 0664 $2/$1
 }
-systemd_files consul.service
-systemd_files consul-online.service
-systemd_files consul-online.target
-systemd_files nomad.service
-systemd_files vault.service
+systemd_files consul.service ${SYSTEMD_DIR}
+systemd_files consul-online.service ${SYSTEMD_DIR}
+systemd_files consul-online.target ${SYSTEMD_DIR}
+systemd_files nomad.service ${SYSTEMD_DIR}
+systemd_files vault.service ${SYSTEMD_DIR}
 
 sudo cp /tmp/files/consul-online.sh /usr/bin/consul-online.sh
 sudo chmod +x /usr/bin/consul-online.sh
 sudo systemctl enable consul-online
-
-echo "Installing Docker for Nomad"
-curl -sSL https://get.docker.com/ | sudo sh
-sudo sh -c "echo \"DOCKER_OPTS='--dns 127.0.0.1 --dns 8.8.8.8 --dns-search service.consul'\" >> /etc/default/docker"
-sudo systemctl enable docker
-
 
 echo "Setup Hashistack profile"
 cat <<PROFILE | sudo tee /etc/profile.d/hashistack.sh
