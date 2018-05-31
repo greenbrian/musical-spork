@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+exec 1> >(logger -s -t $(basename $0)) 2>&1
+
 instance_id="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)"
 local_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)"
 public_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)"
