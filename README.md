@@ -12,3 +12,46 @@ This contains HashiCorp code to do the following:
 - Vault Enterprise linux binary available locally (Consul Enterprise and Nomad Enterpise are optional)
 - User possesses AWS account and credentials
 
+## Packer Usage
+1. Download Consul, Nomad, and Vault binaries locally (Vault enterprise required, Consul and Nomad Enterprise )
+2. Copy packer/vars.json.example to packer/vars.json
+3. Configure variables local path to those binaries in packer/vars.json
+4. Ensure AWS credentials are exposed as environment variables
+5. Execute Packer build
+```
+cd packer
+packer build -var-file=vars.json -only=amazon-ebs-rhel-7.3-systemd  packer.json   
+```
+
+## Terraform usage
+
+Configure Terraform variables
+```
+cp terraform.tfvars.example terraform.tfvars
+# edit terraform.tfvars
+```
+
+Initialize Terraform  
+```
+cd terraform
+terraform init
+```
+
+Terraform plan execution with summary of changes
+```
+terraform plan
+```
+
+Terraform apply to create infrastructure
+```
+terraform apply 
+
+# apply execution without prompt
+# terraform apply -auto-approve
+```
+
+Tear down infrastructure using Terraform destroy
+
+```
+terraform destroy -force
+```
