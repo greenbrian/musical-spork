@@ -11,6 +11,11 @@ data aws_ami "hashistack" {
     name   = "tag:OS"
     values = ["${var.operating_system}"]
   }
+
+  filter {
+    name   = "tag:OS-Version"
+    values = ["${var.operating_system_version}"]
+  }
 }
 
 resource "aws_key_pair" "main" {
@@ -65,6 +70,7 @@ data "template_file" "admin" {
     remote_regions                   = "${join(" ", var.remote_regions)}"
     vault_cloud_auto_init_and_unseal = "${var.vault_cloud_auto_init_and_unseal}"
     vault_auto_replication_setup     = "${var.vault_auto_replication_setup}"
+    ssh_user_name                    = "${var.ssh_user_name}"
   }
 }
 

@@ -5,9 +5,10 @@ local_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)"
 public_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)"
 new_hostname="hashistack-$${instance_id}"
 
-# Detect package management system.
-#YUM=$(which yum 2>/dev/null)
-#APT_GET=$(which apt-get 2>/dev/null)
+echo "${private_key}" > /home/${ssh_user_name}/.ssh/id_rsa
+chmod 0700 /home/${ssh_user_name}/.ssh
+chmod 0600 /home/${ssh_user_name}/.ssh/id_rsa
+chown ${ssh_user_name}:${ssh_user_name} /home/${ssh_user_name}/.ssh/id_rsa
 
 # set the hostname (before starting consul and nomad)
 hostnamectl set-hostname "$${new_hostname}"

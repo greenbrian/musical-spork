@@ -11,6 +11,11 @@ data aws_ami "hashistack" {
     name   = "tag:OS"
     values = ["${var.operating_system}"]
   }
+
+  filter {
+    name   = "tag:OS-Version"
+    values = ["${var.operating_system_version}"]
+  }
 }
 
 resource "aws_key_pair" "main" {
