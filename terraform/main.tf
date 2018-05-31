@@ -34,14 +34,17 @@ module "vpc-east" {
     aws = "aws.east"
   }
 
-  source             = "terraform-aws-modules/vpc/aws"
-  name               = "${random_id.environment_name.hex}-east"
-  cidr               = "10.0.0.0/16"
-  azs                = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  private_subnets    = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets     = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
-  enable_nat_gateway = true
-  enable_vpn_gateway = false
+  source                           = "terraform-aws-modules/vpc/aws"
+  name                             = "${random_id.environment_name.hex}-east"
+  cidr                             = "10.0.0.0/16"
+  azs                              = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  private_subnets                  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  public_subnets                   = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+  enable_nat_gateway               = true
+  enable_vpn_gateway               = false
+  enable_dhcp_options              = true
+  dhcp_options_domain_name         = "service.consul"
+  dhcp_options_domain_name_servers = ["127.0.0.1", "169.254.169.253"]
 
   tags = {
     owner = "${var.owner}"
@@ -54,14 +57,17 @@ module "vpc-west" {
     aws = "aws.west"
   }
 
-  source             = "terraform-aws-modules/vpc/aws"
-  name               = "${random_id.environment_name.hex}-west"
-  cidr               = "172.16.0.0/16"
-  azs                = ["us-west-2a", "us-west-2b", "us-west-2c"]
-  private_subnets    = ["172.16.1.0/24", "172.16.2.0/24", "172.16.3.0/24"]
-  public_subnets     = ["172.16.101.0/24", "172.16.102.0/24", "172.16.103.0/24"]
-  enable_nat_gateway = true
-  enable_vpn_gateway = false
+  source                           = "terraform-aws-modules/vpc/aws"
+  name                             = "${random_id.environment_name.hex}-west"
+  cidr                             = "172.16.0.0/16"
+  azs                              = ["us-west-2a", "us-west-2b", "us-west-2c"]
+  private_subnets                  = ["172.16.1.0/24", "172.16.2.0/24", "172.16.3.0/24"]
+  public_subnets                   = ["172.16.101.0/24", "172.16.102.0/24", "172.16.103.0/24"]
+  enable_nat_gateway               = true
+  enable_vpn_gateway               = false
+  enable_dhcp_options              = true
+  dhcp_options_domain_name         = "service.consul"
+  dhcp_options_domain_name_servers = ["127.0.0.1", "169.254.169.253"]
 
   tags = {
     owner = "${var.owner}"
