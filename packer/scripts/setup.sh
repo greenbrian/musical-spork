@@ -70,10 +70,17 @@ systemd_files consul-online.service ${SYSTEMD_DIR}
 systemd_files consul-online.target ${SYSTEMD_DIR}
 systemd_files nomad.service ${SYSTEMD_DIR}
 systemd_files vault.service ${SYSTEMD_DIR}
+systemd_files vault-secure-intro.service ${SYSTEMD_DIR}
 
 sudo cp /tmp/files/consul-online.sh /usr/bin/consul-online.sh
 sudo chmod +x /usr/bin/consul-online.sh
 sudo systemctl enable consul-online
+
+sudo cp /tmp/files/aws-iam-login.sh /usr/bin/aws-iam-login.sh
+sudo chmod +x /usr/bin/aws-iam-login.sh
+
+sudo cp /tmp/files/aws-iam-login-cleanup.sh /usr/bin/aws-iam-login-cleanup.sh
+sudo chmod +x /usr/bin/aws-iam-login-cleanup.sh
 
 echo "Setup Hashistack profile"
 cat <<PROFILE | sudo tee /etc/profile.d/hashistack.sh

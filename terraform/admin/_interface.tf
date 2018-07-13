@@ -22,6 +22,20 @@ variable "instance_type" {
   description = "AWS instance type to use eg m4.large"
 }
 
+variable "aws_auth_access_key" {
+  type        = "string"
+  description = "AWS access key used by Vault to validate AWS authentication attempts"
+}
+
+variable "aws_auth_secret_key" {
+  type        = "string"
+  description = "AWS secret key used by Vault to validate AWS authentication attempts"
+}
+
+variable "hashistack_instance_arn" {
+  description = "AWS IAM role ARN value for Hashistack node"
+}
+
 variable "operating_system" {
   default     = "rhel"
   description = "Operating system type, supported options are rhel and ubuntu"

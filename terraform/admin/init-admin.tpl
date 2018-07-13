@@ -147,6 +147,63 @@ path "*" {
 }' | vault policy write vault-admin -
 vault auth enable userpass
 vault write auth/userpass/users/vault password=vault policies=vault-admin
-#Run fabio
+
+# Setup Nomad integration with Vault
+# https://www.nomadproject.io/docs/vault-integration/index.html
+
+echo "Configuring Vault policy for Nomad"
+curl https://nomadproject.io/data/vault/nomad-server-policy.hcl -O -s -L
+vault policy write nomad-server nomad-server-policy.hcl
+
+echo "Creating Vault token role for Nomad"
+curl https://nomadproject.io/data/vault/nomad-cluster-role.json -O -s -L
+vault write /auth/token/roles/nomad-cluster @nomad-cluster-role.json
+
+
+echo "Enable AWS authentication method via REST API"
+LOCAL_ACTIVE_VAULT=$(curl -s http://127.0.0.1:8500/v1/catalog/service/vault?tags=active | jq -r '.[0].Address')
+aws_auth_payload=$(cat <<EOF
+{
+  "type": "aws",
+  "description": "AWS authentication setup"
+}
+EOF
+)
+
+curl \
+    --silent \
+    --header "X-Vault-Token: $${VAULT_TOKEN}" \
+    --request POST \
+    --data "$${aws_auth_payload}" \
+    http://$${LOCAL_ACTIVE_VAULT}:8200/v1/sys/auth/aws
+
+echo "Configure AWS credentials in Vault for AWS authentication method"
+curl \
+    --silent \
+    --header "X-Vault-Token: $${VAULT_TOKEN}" \
+    --request POST \
+    --data '{ "access_key": "${aws_auth_access_key}", "secret_key": "${aws_auth_secret_key}"}' \
+    http://$${LOCAL_ACTIVE_VAULT}:8200/v1/auth/aws/config/client
+
+echo "Configure AWS role in Vault for AWS authentication method"
+test_role_payload=$(cat <<EOF
+{
+  "auth_type": "iam",
+  "bound_iam_principal_arn": "${hashistack_instance_arn}",
+  "policies": "nomad-server",
+  "max_ttl": "500h"
+}
+EOF
+)
+
+curl \
+    --silent \
+    --header "X-Vault-Token: $${VAULT_TOKEN}" \
+    --request POST \
+    --data "$${test_role_payload}" \
+    http://$${LOCAL_ACTIVE_VAULT}:8200/v1/auth/aws/role/test-role-iam
+
+
+echo "Running Fabio load balancer as Nomad job"
 export NOMAD_ADDR="http://$(curl -s http://127.0.0.1:8500/v1/catalog/service/nomad-server?dc=${local_region} | jq -r '.[0].Address'):4646"
 nomad run /home/ubuntu/nomad/fabio-${local_region}.nomad

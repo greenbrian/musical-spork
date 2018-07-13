@@ -71,6 +71,9 @@ data "template_file" "admin" {
     vault_cloud_auto_init_and_unseal = "${var.vault_cloud_auto_init_and_unseal}"
     vault_auto_replication_setup     = "${var.vault_auto_replication_setup}"
     ssh_user_name                    = "${var.ssh_user_name}"
+    aws_auth_access_key              = "${var.aws_auth_access_key}"
+    aws_auth_secret_key              = "${var.aws_auth_secret_key}"
+    hashistack_instance_arn          = "${var.hashistack_instance_arn}"
   }
 }
 

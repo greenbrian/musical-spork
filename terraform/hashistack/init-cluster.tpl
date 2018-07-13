@@ -92,7 +92,10 @@ client {
 EOF
 
 # start nomad once it is configured correctly
-systemctl start nomad
+systemctl start nomad.service --no-block
+
+# start vault secure intro
+systemctl start vault-secure-intro.service --no-block
 
 # currently no additional configuration required for vault
 # todo: support TLS in hashistack and pass in {vault_use_tls} once available
@@ -129,3 +132,5 @@ EOF
 
 sudo systemctl enable consul-template.service
 sudo systemctl start consul-template.service
+
+
