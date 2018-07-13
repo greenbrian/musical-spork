@@ -136,4 +136,7 @@ module "admin-east" {
   ssh_user_name                    = "${var.ssh_user_name}"
   operating_system                 = "${var.operating_system}"
   operating_system_version         = "${var.operating_system_version}"
+  aws_auth_access_key              = "${aws_iam_access_key.vault.id}"
+  aws_auth_secret_key              = "${aws_iam_access_key.vault.secret}"
+  hashistack_instance_arn          = "${module.hashistack-instance-profile.hashistack_instance_arn}"
 }

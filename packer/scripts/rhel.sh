@@ -6,7 +6,7 @@ sudo yum-config-manager --enable rhui-REGION-rhel-server-releases-optional
 sudo yum-config-manager --enable rhui-REGION-rhel-server-supplementary
 sudo yum-config-manager --enable rhui-REGION-rhel-server-extras
 sudo yum -y check-update
-sudo yum install -q -y wget unzip dnsmasq bind-utils ruby rubygems ntp git ca-certificates
+sudo yum install -q -y wget unzip dnsmasq bind-utils ruby rubygems ntp git ca-certificates vim-enhanced
 sudo systemctl start ntpd.service
 sudo systemctl enable ntpd.service
 sudo systemctl stop firewalld.service
