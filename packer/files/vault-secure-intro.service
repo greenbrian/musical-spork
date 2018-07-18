@@ -1,0 +1,14 @@
+[Unit]
+Description=Vault AWS IAM login to retrieve Nomad specific Vault token
+Requires=consul-online.target 
+After=consul-online.target 
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/aws-iam-login.sh
+RemainAfterExit=true
+ExecStop=/usr/bin/aws-iam-login-cleanup.sh
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target
