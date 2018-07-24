@@ -206,4 +206,4 @@ curl \
 
 echo "Running Fabio load balancer as Nomad job"
 export NOMAD_ADDR="http://$(curl -s http://127.0.0.1:8500/v1/catalog/service/nomad-server?dc=${local_region} | jq -r '.[0].Address'):4646"
-nomad run /home/ubuntu/nomad/fabio-${local_region}.nomad
+nomad run /home/ec2-user/nomad/fabio-${local_region}.nomad
