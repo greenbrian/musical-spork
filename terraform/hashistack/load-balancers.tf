@@ -69,3 +69,28 @@ resource "aws_lb_listener" "fabio-http" {
     type             = "forward"
   }
 }
+
+#HAProxy
+resource "aws_lb" "haproxy" {
+  name               = "${var.environment_name}-haproxy"
+  load_balancer_type = "network"
+  internal           = false
+  subnets            = ["${var.public_subnet_ids}"]
+}
+
+resource "aws_lb_target_group" "haproxy-http" {
+  port     = 80
+  protocol = "TCP"
+  vpc_id   = "${var.vpc_id}"
+}
+
+resource "aws_lb_listener" "haproxy-http" {
+  load_balancer_arn = "${aws_lb.haproxy.arn}"
+  port              = "80"
+  protocol          = "TCP"
+
+  default_action {
+    target_group_arn = "${aws_lb_target_group.haproxy-http.arn}"
+    type             = "forward"
+  }
+}

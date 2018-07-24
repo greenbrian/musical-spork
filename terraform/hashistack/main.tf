@@ -39,7 +39,7 @@ data "template_file" "init" {
 }
 
 resource "aws_launch_configuration" "hashistack_server" {
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   ebs_optimized               = false
   iam_instance_profile        = "${var.instance_profile}"
   image_id                    = "${data.aws_ami.hashistack.id}"

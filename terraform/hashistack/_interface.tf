@@ -54,3 +54,7 @@ output "vault-ui" {
 output "fabio-ui" {
   value = "http://${aws_lb.fabio.dns_name}:9998"
 }
+
+output "fabio-router" {
+  value = "http://${aws_lb.fabio.dns_name}:9999"
+}
