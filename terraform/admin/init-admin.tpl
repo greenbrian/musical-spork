@@ -136,6 +136,9 @@ fi
 sudo cat << EOF > /etc/profile.d/nomad.sh
 export NOMAD_ADDR="http://nomad-server.service.consul:4646"
 EOF
+sudo cat << EOF > /etc/profile.d/vault.sh
+export VAULT_ADDR="http://active.vault.service.consul:8200"
+EOF
 sleep 10
 
 # Setup Vault demo secret
