@@ -134,7 +134,10 @@ fi
 
 # Set NOMAD_ADDR to connect to local Nomad cluster
 sudo cat << EOF > /etc/profile.d/nomad.sh
-export NOMAD_ADDR="http://$(curl -s http://127.0.0.1:8500/v1/catalog/service/nomad-server?dc=${local_region} | jq -r '.[0].Address'):4646"
+export NOMAD_ADDR="http://nomad-server.service.consul:4646"
+EOF
+sudo cat << EOF > /etc/profile.d/vault.sh
+export VAULT_ADDR="http://active.vault.service.consul:8200"
 EOF
 sleep 10
 
@@ -206,4 +209,4 @@ curl \
 
 echo "Running Fabio load balancer as Nomad job"
 export NOMAD_ADDR="http://$(curl -s http://127.0.0.1:8500/v1/catalog/service/nomad-server?dc=${local_region} | jq -r '.[0].Address'):4646"
-nomad run /home/ubuntu/nomad/fabio-${local_region}.nomad
+nomad run /home/ec2-user/nomad/fabio-${local_region}.nomad
