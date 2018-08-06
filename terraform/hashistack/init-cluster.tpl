@@ -46,6 +46,9 @@ ui                  = true
 retry_join          = ["provider=aws tag_key=Environment-Name tag_value=${environment_name}"]
 retry_join_wan      = [ ${wan_join} ]
 disable_remote_exec = false
+connect {
+  enabled = true
+}
 EOF
 
 chown consul:consul /etc/consul.d/consul.hcl

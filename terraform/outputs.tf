@@ -21,3 +21,7 @@ output "vault-ui-us-west-2" {
 output "fabio-ui-us-west-2" {
   value = "${module.hashistack-us-west.fabio-ui}"
 }
+
+output "fabio-router-haproxy" {
+  value = "${module.hashistack-us-east.fabio-router}/haproxy"
+}
