@@ -55,6 +55,10 @@ output "fabio-ui" {
   value = "http://${aws_lb.fabio.dns_name}:9998"
 }
 
+output "nomad-ui" {
+  value = "http://${aws_lb.nomad.dns_name}:4646/ui"
+}
+
 output "fabio-router" {
   value = "http://${aws_lb.fabio.dns_name}:9999"
 }
