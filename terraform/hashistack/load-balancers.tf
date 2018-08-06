@@ -69,3 +69,33 @@ resource "aws_lb_listener" "fabio-http" {
     type             = "forward"
   }
 }
+
+resource "aws_lb" "nomad" {
+  name               = "${var.environment_name}-nomad"
+  load_balancer_type = "application"
+  internal           = false
+  subnets            = ["${var.public_subnet_ids}"]
+  security_groups    = ["${aws_security_group.allow_all_hashistack.id}"]
+}
+
+resource "aws_lb_target_group" "nomad" {
+  port     = 4646
+  protocol = "HTTP"
+  vpc_id   = "${var.vpc_id}"
+}
+
+resource "aws_lb_listener" "nomad" {
+  load_balancer_arn = "${aws_lb.nomad.arn}"
+  port              = "4646"
+  protocol          = "HTTP"
+
+  default_action {
+    target_group_arn = "${aws_lb_target_group.nomad.arn}"
+    type             = "forward"
+  }
+}
+
+resource "aws_autoscaling_attachment" "asg_attachment_nomad" {
+  autoscaling_group_name = "${aws_autoscaling_group.hashistack_server.id}"
+  alb_target_group_arn   = "${aws_lb_target_group.nomad.arn}"
+}
