@@ -95,7 +95,7 @@ module "hashistack-us-east" {
   public_subnet_ids        = "${module.vpc-east.public_subnets}"
   vpc_id                   = "${module.vpc-east.vpc_id}"
   kms_id                   = "${aws_kms_key.vault.key_id}"
-  ssh_user_name            = "${lookup(local.ssh_user_map,var.operation_system)}"
+  ssh_user_name            = "${lookup(local.ssh_user_map,var.operating_system)}"
   operating_system         = "${var.operating_system}"
   operating_system_version = "${var.operating_system_version}"
 }
