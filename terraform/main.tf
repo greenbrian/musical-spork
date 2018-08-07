@@ -98,6 +98,7 @@ module "hashistack-us-east" {
   ssh_user_name            = "${lookup(local.ssh_user_map,var.operating_system)}"
   operating_system         = "${var.operating_system}"
   operating_system_version = "${var.operating_system_version}"
+  vanity_domain            = "${var.root_domain}"
 }
 
 module "hashistack-us-west" {
@@ -119,6 +120,7 @@ module "hashistack-us-west" {
   ssh_user_name            = "${lookup(local.ssh_user_map,var.operating_system)}"
   operating_system         = "${var.operating_system}"
   operating_system_version = "${var.operating_system_version}"
+  vanity_domain            = "${var.root_domain}"
 }
 
 module "admin-east" {

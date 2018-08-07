@@ -47,14 +47,19 @@ variable "remote_regions" {
   type = "list"
 }
 
+variable "vanity_domain" {
+  default     = "none"
+  description = "Vanity domain name to use"
+}
+
 output "vault-ui" {
-  value = "http://${aws_lb.vault.dns_name}:8200/ui"
+  value = "${var.vanity_domain == "none" ? "http://${aws_route53_record.vault.name}:8200/ui" : "http://${aws_lb.vault.dns_name}:8200/ui"}"
 }
 
 output "fabio-ui" {
-  value = "http://${aws_lb.fabio.dns_name}:9998"
+  value = "${var.vanity_domain == "none" ? "http://${aws_route53_record.fabio.name}:9998" : "http://${aws_lb.fabio.dns_name}:9998"}"
 }
 
 output "fabio-router" {
-  value = "http://${aws_lb.fabio.dns_name}:9999"
+  value = "${var.vanity_domain == "none" ? "http://${aws_route53_record.fabio.name}:9999" : "http://${aws_lb.fabio.dns_name}:9999"}"
 }
