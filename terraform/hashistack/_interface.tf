@@ -53,13 +53,13 @@ variable "vanity_domain" {
 }
 
 output "vault-ui" {
-  value = "${var.vanity_domain == "none" ? "http://${aws_route53_record.vault.name}:8200/ui" : "http://${aws_lb.vault.dns_name}:8200/ui"}"
+  value = "${var.vanity_domain == "none" ? "http://${aws_route53_record.vault.*.name}:8200/ui" : "http://${aws_lb.vault.dns_name}:8200/ui"}"
 }
 
 output "fabio-ui" {
-  value = "${var.vanity_domain == "none" ? "http://${aws_route53_record.fabio.name}:9998" : "http://${aws_lb.fabio.dns_name}:9998"}"
+  value = "${var.vanity_domain == "none" ? "http://${aws_route53_record.fabio.*.name}:9998" : "http://${aws_lb.fabio.dns_name}:9998"}"
 }
 
 output "fabio-router" {
-  value = "${var.vanity_domain == "none" ? "http://${aws_route53_record.fabio.name}:9999" : "http://${aws_lb.fabio.dns_name}:9999"}"
+  value = "${var.vanity_domain == "none" ? "http://${aws_route53_record.fabio.*.name}:9999" : "http://${aws_lb.fabio.dns_name}:9999"}"
 }
