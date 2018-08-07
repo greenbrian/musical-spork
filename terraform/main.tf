@@ -145,4 +145,5 @@ module "admin-east" {
   aws_auth_access_key              = "${aws_iam_access_key.vault.id}"
   aws_auth_secret_key              = "${aws_iam_access_key.vault.secret}"
   hashistack_instance_arn          = "${module.hashistack-instance-profile.hashistack_instance_arn}"
+  vanity_domain                    = "${var.root_domain}"
 }

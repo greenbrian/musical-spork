@@ -65,6 +65,15 @@ output "ssh_info" {
   value = "${data.template_file.format_ssh.rendered}"
 }
 
+variable "vanity_domain" {
+  default     = "none"
+  description = "Vanity domain name to use"
+}
+
+output "vault-ui" {
+  value = "${var.vanity_domain == "none" ? "http://${aws_instance.admin.public_ip}:8500/ui" : "http://${aws_route53_record.consul.0.name}:8500/ui"}"
+}
+
 output "consul-ui" {
   value = "http://${aws_instance.admin.public_ip}:8500/ui"
 }
