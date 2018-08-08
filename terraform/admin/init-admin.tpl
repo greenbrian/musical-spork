@@ -295,3 +295,33 @@ vault write ssh-client-signer/roles/my-role -<<"EOH"
   "ttl": "30m0s"
 }
 EOH
+
+
+#AWS SECRETS ENGINE
+vault secrets enable aws
+vault write aws/config/root \
+access_key=${aws_auth_access_key}  \
+secret_key=${aws_auth_secret_key}  \
+region=${local_region}
+vault write aws/config/lease lease=1m lease_max=5m
+echo '
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": ["arn:aws:s3:::vault-demo"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": ["arn:aws:s3:::vault-demo/*"]
+    }
+  ]
+}' > iam.policy
+vault write aws/roles/s3access policy=@iam.policy
