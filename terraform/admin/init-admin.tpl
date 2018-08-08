@@ -279,6 +279,10 @@ vault write database/roles/readonly \
   max_ttl="24h"
 
 #SSH-CA
+# USAGE
+# Use the ssh-client-signer backend in the GUI to sign your public key
+# Save resulting key as ~/.ssh/id_rsa-cert.pub on your local machine
+# ssh into the admin machine using the new signed cert
 vault secrets enable -path=ssh-client-signer ssh
 vault write -f -format=json ssh-client-signer/config/ca | jq -r '.data.public_key' > /home/ubuntu/trusted-user-ca-keys.pem
 vault write ssh-client-signer/roles/my-role -<<"EOH"
