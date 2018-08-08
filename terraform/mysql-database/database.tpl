@@ -73,4 +73,4 @@ fi
 echo '{"service": {"name": "db", "tags": ["mysql"], "port":3306}}' | sudo tee /etc/consul.d/mysql.json
 
 # start consul once it is configured correctly
-systemctl start consul
+systemctl restart consul
