@@ -1,5 +1,5 @@
 resource "aws_iam_user" "vault_validation" {
-  name = "${var.owner}-vault_validation"
+  name = "${random_id.environment_name.hex}_vault_validation"
   path = "/${random_id.environment_name.hex}-east/"
 }
 
@@ -8,7 +8,7 @@ resource "aws_iam_access_key" "vault" {
 }
 
 resource "aws_iam_user_policy" "vault_ro" {
-  name = "${var.owner}-vault_validation_policy"
+  name = "${random_id.environment_name.hex}_vault_validation_policy"
   user = "${aws_iam_user.vault_validation.name}"
 
   policy = <<EOF

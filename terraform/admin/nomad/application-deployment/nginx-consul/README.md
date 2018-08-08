@@ -1,14 +1,15 @@
-# Nginx Deployment (Template Example)
-The goal of this guide is to help users deploy Nginx on Nomad. In the process we will also show how to use Nomad templating to update the configuration of our deployed tasks. (Nomad uses Consul Template under the hood) 
+## Nginx Deployment (Template Example)
+Deploy nginx on Nomad. Uses Consul KV for configuration.
 
-### TLDR;
 ```bash
-vagrant@node1:/vagrant/application-deployment/nginx$ ./kv_consul_setup.sh
+$ chmod +x kv_consul_setup.sh
 
-vagrant@node1:/vagrant/application-deployment/nginx$ nomad run nginx-consul.nomad
+$ ./kv_consul_setup.sh
 
-#Validate the results on Nomad clients, job assigns static port 8080 
-#if using vagrantfile check:
-http://localhost:8080/nginx/
+$ nomad run nginx-consul.nomad
+```
+Check results using Fabio. 
 
+```bash
+http://ak-hs-9a0ff0bb-fabio-4220c9210d8e0876.elb.us-east-1.amazonaws.com:9999/nginx/
 ```
