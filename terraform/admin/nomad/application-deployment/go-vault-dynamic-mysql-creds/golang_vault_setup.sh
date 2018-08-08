@@ -1,6 +1,6 @@
 #!/bin/bash
 
-consul kv get service/vault/us-east-1-root-token | vault auth -
+vault auth -method=userpass username=vault password=vault
 
 POLICY='path "database/creds/readonly" { capabilities = [ "read", "list" ] }'
 

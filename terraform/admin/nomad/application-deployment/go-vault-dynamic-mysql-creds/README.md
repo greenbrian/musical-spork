@@ -1,50 +1,53 @@
-# Golang Application + Dynamic Database Credentials (MySQL) 
-This guide will discuss native app library integration and dynamic database credentials with Nomad, Vault, and MySQL. It will also show revoking those dynamic database credentials with Vault's GUI.
+## Golang App Deployment with dynamic database credentials
 
-#### TLDR;
-Using Vagrantfile setup:
 ```bash
-vagrant@node1:/vagrant/vault-examples/goapp$ ./golang_vault_setup.sh
+$ chmod +x golang_vault_setup.sh
+$ ./golang_vault_setup.sh
+$ nomad run application.nomad
+```
+Now we can drill down on the app logs
 
-vagrant@node1:/vagrant/vault-examples/goapp$ nomad run application.nomad
-
-vagrant@node1:/vagrant/vault-examples/goapp$ nomad status app
-
-#Pull an alloc id from status, logs show dynamic username password
-vagrant@node1:/vagrant/vault-examples/goapp$ nomad logs -stderr 435bf5cd
+```bash
+$ nomad status app
 . . .
-2018/01/04 20:28:49 username v-read-40xpu913r, password A1a-73r2ywpqx6wrqqts
+Allocations
+ID        Node ID   Task Group  Version  Desired  Status   Created  Modified
+3d01fe8d  78885a75  app         0        run      running  4s ago   2s ago
+89aa2df4  1555a5bf  app         0        run      running  4s ago   2s ago
+f1dd01de  315e9c08  app         0        run      running  4s ago   2s ago
+```
 
-#On Node3 
-vagrant@node3:~$ mysql -h 192.168.50.152 -u vaultadmin -pvaultadminpassword
+Check the logs of an alloc, you should see the dyamic creds
+```bash
+$ nomad logs -stderr 3d01fe8d
+2018/08/08 15:48:03 Starting Go App
+2018/08/08 15:48:03 Getting database credentials...
+2018/08/08 15:48:03 username v-read-uKOR92cRd, password A1a-VHNvEj9Xkk0sIURD
+2018/08/08 15:48:03 Initializing database connection pool...
+2018/08/08 15:48:03 HTTP service listening on 10.0.1.192:8080
+2018/08/08 15:48:03 Renewing credentials: database/creds/readonly/bd9a9211-776c-359e-6c3f-f02578e3b4a6
+```
+
+Hop back to the Vault GUI and revoke the database creds via their leases.
+```bash
+http://ak-hs-b7947d86-vault-1073633556.us-east-1.elb.amazonaws.com:8200/ui/vault/access/leases/list
+```
+
+Once revoked you can take a look at the database if you would like. (It should be empty after the leases are revoked, I haven't done that here).
+
+```bash
+
+$ sudo yum install -y mariadb-server
+$ mysql -h $(dig +short db.service.consul | sed -n 1p) -u vaultadmin -pvaultadminpassword
+
 MariaDB [(none)]> SELECT User FROM mysql.user;
 +------------------+
 | User             |
 +------------------+
-| v-read-40xpu913r |
-| v-read-q5sr6rzrz |
-| v-read-xr3v2yrsr |
+| v-read-3uZU2tm2z |
+| v-read-uKOR92cRd |
+| v-read-w4YV1KD53 |
 | vaultadmin       |
 | root             |
 +------------------+
-
-#login to Vault GUI
-username: vault   password: vault
-http://localhost:8200/ui/vault/auth?with=userpass
-
-#revoke database credentials:
-http://localhost:8200/ui/vault/leases/list/mysql/creds/app/
-
-#Show database users/passwords deleted in mysql
-MariaDB [(none)]> SELECT User FROM mysql.user;
-+------------+
-| User       |
-+------------+
-| vaultadmin |
-| root       |
-+------------+
-
-#Optional: App output is simple, you can check in browser as well http://localhost:8080
-vagrant@node1:/vagrant/vault-examples/goapp$ curl http://10.0.2.15:8080
-{"message":"Hello"}
 ```
