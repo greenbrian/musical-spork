@@ -19,7 +19,20 @@ resource "aws_iam_user_policy" "vault_ro" {
       "Action": [
         "ec2:DescribeInstances",
         "iam:GetRole",
-        "iam:GetUser"
+        "iam:GetUser",
+        "iam:AttachUserPolicy",
+        "iam:CreateAccessKey",
+        "iam:CreateUser",
+        "iam:DeleteAccessKey",
+        "iam:DeleteUser",
+        "iam:DeleteUserPolicy",
+        "iam:DetachUserPolicy",
+        "iam:ListAccessKeys",
+        "iam:ListAttachedUserPolicies",
+        "iam:ListGroupsForUser",
+        "iam:ListUserPolicies",
+        "iam:PutUserPolicy",
+        "iam:RemoveUserFromGroup"
       ],
       "Effect": "Allow",
       "Resource": "*"
