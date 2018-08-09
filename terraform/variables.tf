@@ -35,3 +35,8 @@ variable "ssh_user_name" {
   default     = "ec2-user"
   description = "Default ssh username for provisioning, ec2-user for rhel systems, ubuntu for ubuntu systems"
 }
+
+variable "root_domain" {
+  default     = "none"
+  description = "Domain to use for vanity demos"
+}

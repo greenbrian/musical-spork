@@ -5,12 +5,10 @@ env_name = "hashistack"
 # rhel option
 operating_system           = "rhel"
 operating_system_version   = "7.3"
-ssh_user_name              = "ec2-user"
 
 # ubuntu option - work in progress
 #operating_system           = "ubuntu"
 #operating_system_version   = "16.04"
-#ssh_user_name              = "ubuntu"
 
 # automatically initialize and unseal vault clusters 
 vault_cloud_auto_init_and_unseal   = "true"
@@ -26,3 +24,7 @@ nomad_enabled                = "true"
 
 # use kms key for auto unseal
 vault_cloud_unseal           = "true"
+
+# custom URL to utilize - this is optional
+# the domain must already be registered in AWS
+root_domain = "this-demo.rocks"
