@@ -33,6 +33,11 @@ variable "ssh_user_name" {
   description = "Default ssh username for provisioning, ec2-user for rhel systems, ubuntu for ubuntu systems"
 }
 
+variable "vanity_domain" {
+  default     = "none"
+  description = "Vanity domain name to use"
+}
+
 output "db_address" {
   value = "${var.vanity_domain == "none" ? "${aws_instance.db.public_ip}" : "${element(concat(aws_route53_record.db.*.name, list("")), 0)}"}"
 }
