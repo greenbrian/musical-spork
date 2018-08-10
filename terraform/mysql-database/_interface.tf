@@ -34,5 +34,5 @@ variable "ssh_user_name" {
 }
 
 output "db_address" {
-  value = "${aws_instance.db.public_ip}"
+  value = "${var.vanity_domain == "none" ? "${aws_instance.db.public_ip}" : "${element(concat(aws_route53_record.db.*.name, list("")), 0)}"}"
 }
