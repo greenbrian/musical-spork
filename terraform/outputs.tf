@@ -2,6 +2,10 @@ output "admin-ssh-us-east-1" {
   value = "${module.admin-east.ssh_info}"
 }
 
+output "mysql-database-us-east-1" {
+  value = "${module.mysql-database.db_address}"
+}
+
 output "consul-ui-us-east-1" {
   value = "${module.admin-east.consul-ui}"
 }
@@ -20,6 +24,10 @@ output "vault-ui-us-west-2" {
 
 output "fabio-ui-us-west-2" {
   value = "${module.hashistack-us-west.fabio-ui}"
+}
+
+output "nomad-ui-us-east-1" {
+  value = "${module.hashistack-us-east.nomad-ui}"
 }
 
 output "fabio-router-haproxy" {

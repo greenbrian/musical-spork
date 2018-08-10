@@ -58,6 +58,13 @@ output "vault-ui" {
 
 output "fabio-ui" {
   value = "${var.vanity_domain == "none" ? "http://${aws_lb.fabio.dns_name}:9998" : "http://${element(concat(aws_route53_record.fabio.*.name, list("")), 0)}:9998"}"
+<<<<<<< HEAD
+=======
+}
+
+output "nomad-ui" {
+  value = "http://${aws_lb.nomad.dns_name}:4646/ui"
+>>>>>>> a8b656ae5537481d7bfc4c55d44a6581e39318d2
 }
 
 output "fabio-router" {
