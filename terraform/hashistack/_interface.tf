@@ -61,7 +61,7 @@ output "fabio-ui" {
 }
 
 output "nomad-ui" {
-  value = "http://${aws_lb.nomad.dns_name}:4646/ui"
+  value = "${var.vanity_domain == "none" ? "http://${aws_lb.nomad.dns_name}:4646/ui" : "http://${element(concat(aws_route53_record.nomad.*.name, list("")), 0)}:4646/ui"}"
 }
 
 output "fabio-router" {
