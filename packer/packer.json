@@ -40,7 +40,8 @@
         "Vault-Version": "{{ user `vault_version` }}",
         "Nomad-Version": "{{ user `nomad_version` }}",
         "OS": "rhel",
-        "OS-Version": "7.3"
+        "OS-Version": "7.3",
+        "Release": "{{ user `release` }}"
       }
     },
     {

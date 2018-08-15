@@ -11,6 +11,11 @@ variable "env_name" {
   description = "Tag indicating environment name"
 }
 
+variable "nginx_count" {
+  description = "Nginx server count"
+  default     = 2
+}
+
 variable "vault_cloud_auto_init_and_unseal" {
   type        = "string"
   description = "Enable or disable automatic Vault initialization and unseal. True or false, string."

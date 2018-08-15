@@ -329,3 +329,45 @@ echo '
   ]
 }' > iam.policy
 vault write aws/roles/s3access policy=@iam.policy
+
+#### Aviato demo
+# write some basic consul kv pairs
+curl -fX PUT 127.0.0.1:8500/v1/kv/aviato/color/favorite -d YELLOW
+curl -fX PUT 127.0.0.1:8500/v1/kv/aviato/number/huge -d 99999
+
+# enable kv path for demo
+vault secrets enable -version=1 -path=aviato kv
+
+# write some Vault secrets
+vault kv put secret/aviato User1SSN="200-23-9930" User2SSN="000-00-0002" ttl=60s
+
+mkdir -p /tmp/certs/
+
+# Mount Root CA and generate cert
+vault secrets enable -path aviato-root pki
+vault secrets tune -max-lease-ttl=87600h aviato-root
+vault write -format=json aviato-root/root/generate/internal \
+common_name="aviato-root" ttl=87600h | tee \
+>(jq -r .data.certificate > /tmp/certs/ca.pem) \
+>(jq -r .data.issuing_ca > /tmp/certs/issuing_ca.pem) \
+>(jq -r .data.private_key > /tmp/certs/ca-key.pem)
+
+# Mount Intermediate and set cert
+vault secrets enable -path aviato-intermediate pki
+vault secrets tune -max-lease-ttl=87600h aviato-intermediate
+vault write -format=json aviato-intermediate/intermediate/generate/internal \
+  common_name="aviato-intermediate" ttl=43800h | tee \
+  >(jq -r .data.csr > /tmp/certs/aviato-intermediate.csr) \
+  >(jq -r .data.private_key > /tmp/certs/aviato-intermediate.pem)
+
+# Sign the intermediate certificate and set it
+vault write -format=json aviato-root/root/sign-intermediate \
+  csr=@/tmp/certs/aviato-intermediate.csr \
+  common_name="aviato-intermediate" ttl=43800h | tee \
+  >(jq -r .data.certificate > /tmp/certs/aviato-intermediate.pem) \
+  >(jq -r .data.issuing_ca > /tmp/certs/aviato-intermediate_issuing_ca.pem)
+vault write aviato-intermediate/intermediate/set-signed \
+  certificate=@/tmp/certs/aviato-intermediate.pem
+
+# Generate the roles
+vault write aviato-intermediate/roles/aviato-dot-com allow_any_name=true max_ttl="1m"
