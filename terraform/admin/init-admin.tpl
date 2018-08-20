@@ -332,6 +332,7 @@ vault write aws/roles/s3access policy=@iam.policy
 
 
 #SENTINEL
+sentinel_demo() {
 cat <<EOF>> /tmp/business-hours.sentinel
 import "time"
 workdays = rule {
@@ -360,14 +361,16 @@ main = rule when precond {
 }
 EOF
 
-POLICY=$(base64 business-hours.sentinel)
-vault write sys/policies/egp/cidr-check \
+POLICY=$(base64 /tmp/business-hours.sentinel)
+vault write sys/policies/egp/business-hours-check \
         policy="$${POLICY}" \
         paths="secret/*" \
         enforcement_level="hard-mandatory"
 
- POLICY=$(base64 cidr-check.sentinel)
- vault write sys/policies/egp/business-hrs \
+ POLICY=$(base64 /tmp/cidr-check.sentinel)
+ vault write sys/policies/egp/cidr-check \
         policy="$${POLICY}" \
-        paths="secret/accounting/*" \
-        enforcement_level="soft-mandatory"
+        paths="secret/*" \
+        enforcement_level="advisory"
+}
+#sentinel_demo
