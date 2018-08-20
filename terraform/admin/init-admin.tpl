@@ -329,3 +329,45 @@ echo '
   ]
 }' > iam.policy
 vault write aws/roles/s3access policy=@iam.policy
+
+
+#SENTINEL
+cat <<EOF>> /tmp/business-hours.sentinel
+import "time"
+workdays = rule {
+    time.now.weekday > 0 and time.now.weekday < 6
+}
+workhours = rule {
+    time.now.hour > 9 and time.now.hour < 17
+}
+main = rule {
+    workdays and workhours
+}
+EOF
+
+cat <<EOF>> /tmp/cidr-check.sentinel
+import "sockaddr"
+import "strings"
+precond = rule {
+    request.operation in ["create", "update", "delete", "read"] and
+    strings.has_prefix(request.path, "secret/")
+}
+cidrcheck = rule {
+    sockaddr.is_contained(request.connection.remote_addr, "10.0.101.0/24")
+}
+main = rule when precond {
+    cidrcheck
+}
+EOF
+
+POLICY=$(base64 business-hours.sentinel)
+vault write sys/policies/egp/cidr-check \
+        policy="$${POLICY}" \
+        paths="secret/*" \
+        enforcement_level="hard-mandatory"
+
+ POLICY=$(base64 cidr-check.sentinel)
+ vault write sys/policies/egp/business-hrs \
+        policy="$${POLICY}" \
+        paths="secret/accounting/*" \
+        enforcement_level="soft-mandatory"

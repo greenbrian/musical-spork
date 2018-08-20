@@ -47,18 +47,23 @@ variable "remote_regions" {
   type = "list"
 }
 
+variable "vanity_domain" {
+  default     = "none"
+  description = "Vanity domain name to use"
+}
+
 output "vault-ui" {
-  value = "http://${aws_lb.vault.dns_name}:8200/ui"
+  value = "${var.vanity_domain == "none" ? "http://${aws_lb.vault.dns_name}:8200/ui" : "http://${element(concat(aws_route53_record.vault.*.name, list("")), 0)}:8200/ui"}"
 }
 
 output "fabio-ui" {
-  value = "http://${aws_lb.fabio.dns_name}:9998"
+  value = "${var.vanity_domain == "none" ? "http://${aws_lb.fabio.dns_name}:9998" : "http://${element(concat(aws_route53_record.fabio.*.name, list("")), 0)}:9998"}"
 }
 
 output "nomad-ui" {
-  value = "http://${aws_lb.nomad.dns_name}:4646/ui"
+  value = "${var.vanity_domain == "none" ? "http://${aws_lb.nomad.dns_name}:4646/ui" : "http://${element(concat(aws_route53_record.nomad.*.name, list("")), 0)}:4646/ui"}"
 }
 
 output "fabio-router" {
-  value = "http://${aws_lb.fabio.dns_name}:9999"
+  value = "${var.vanity_domain == "none" ? "http://${aws_lb.fabio.dns_name}:9999" : "http://${element(concat(aws_route53_record.fabio.*.name, list("")), 0)}:9999"}"
 }
