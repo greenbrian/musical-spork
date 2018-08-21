@@ -370,7 +370,9 @@ vault write sys/policies/egp/business-hours-check \
  POLICY=$(base64 /tmp/cidr-check.sentinel)
  vault write sys/policies/egp/cidr-check \
         policy="$${POLICY}" \
-        paths="secret/*" \
+        paths="secret/cidr" \
         enforcement_level="advisory"
+vault kv put secret/test foo=bar
+vault kv put secret/cidr foo=bar
 }
-#sentinel_demo
+sentinel_demo
