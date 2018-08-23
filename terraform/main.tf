@@ -166,5 +166,3 @@ module "mysql-database" {
   operating_system_version = "${var.operating_system_version}"
   vanity_domain            = "${var.root_domain}"
 }
-
-
