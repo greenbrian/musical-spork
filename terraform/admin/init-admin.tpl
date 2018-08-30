@@ -378,25 +378,30 @@ vault kv put secret/cidr foo=bar
 #sentinel_demo
 
 
-#Namespaces
-vault namespace create engineering
-vault namespace create -namespace=engineering development
-vault namespace create -namespace=engineering operations
+vault --version | grep 0.11 ; if [ $? -eq 0 ] 
+then 
+  #Namespaces
+  vault namespace create engineering
+  vault namespace create -namespace=engineering development
+  vault namespace create -namespace=engineering operations
+  r
 
-
-#ACL Templating
-echo '
-path "secret/{{identity.entity.name}}/*" {
-	capabilities = [ "create", "update", "read", "delete", "list" ]
-}
-path "secret/" {
-  capabilities = ["list"]
-}' | vault policy write user-tmpl -
-vault write auth/userpass/users/bob password=vault 
-vault auth list -format=json | jq -r '.["userpass/"].accessor' > accessor.txt  
-vault write -format=json identity/entity name="bob_smith" policies="user-tmpl" \
-        | jq -r ".data.id" > entity_id.txt
-vault write identity/entity-alias name="bob" \
-       canonical_id=$(cat entity_id.txt) \
-       mount_accessor=$(cat accessor.txt)
-vault kv put secret/bob_smith/test foo=bar
+  #ACL Templating
+  echo '
+  path "secret/{{identity.entity.name}}/*" {
+    capabilities = [ "create", "update", "read", "delete", "list" ]
+  }
+  path "secret/" {
+    capabilities = ["list"]
+  }' | vault policy write user-tmpl -
+  vault write auth/userpass/users/bob password=vault 
+  vault auth list -format=json | jq -r '.["userpass/"].accessor' > accessor.txt  
+  vault write -format=json identity/entity name="bob_smith" policies="user-tmpl" \
+          | jq -r ".data.id" > entity_id.txt
+  vault write identity/entity-alias name="bob" \
+        canonical_id=$(cat entity_id.txt) \
+        mount_accessor=$(cat accessor.txt)
+  # USAGE
+  # vaultl login -method=userpass username=bob password=vault
+  # vault kv put secret/bob_smith/test foo=ba
+fi
