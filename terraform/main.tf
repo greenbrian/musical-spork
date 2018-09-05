@@ -75,6 +75,10 @@ module "vpc-west" {
   }
 }
 
+locals {
+  ssh_user_map = "${map("ubuntu","ubuntu","rhel","ec2-user")}"
+}
+
 module "hashistack-us-east" {
   source                   = "./hashistack"
   owner                    = "${var.owner}"
@@ -91,9 +95,10 @@ module "hashistack-us-east" {
   public_subnet_ids        = "${module.vpc-east.public_subnets}"
   vpc_id                   = "${module.vpc-east.vpc_id}"
   kms_id                   = "${aws_kms_key.vault.key_id}"
-  ssh_user_name            = "${var.ssh_user_name}"
+  ssh_user_name            = "${lookup(local.ssh_user_map,var.operating_system)}"
   operating_system         = "${var.operating_system}"
   operating_system_version = "${var.operating_system_version}"
+  vanity_domain            = "${var.root_domain}"
 }
 
 module "hashistack-us-west" {
@@ -112,9 +117,10 @@ module "hashistack-us-west" {
   public_subnet_ids        = "${module.vpc-west.public_subnets}"
   vpc_id                   = "${module.vpc-west.vpc_id}"
   kms_id                   = "${aws_kms_key.vault.key_id}"
-  ssh_user_name            = "${var.ssh_user_name}"
+  ssh_user_name            = "${lookup(local.ssh_user_map,var.operating_system)}"
   operating_system         = "${var.operating_system}"
   operating_system_version = "${var.operating_system_version}"
+  vanity_domain            = "${var.root_domain}"
 }
 
 module "admin-east" {
@@ -133,10 +139,30 @@ module "admin-east" {
   vpc_id                           = "${module.vpc-east.vpc_id}"
   vault_cloud_auto_init_and_unseal = "${var.vault_cloud_auto_init_and_unseal}"
   vault_auto_replication_setup     = "${var.vault_auto_replication_setup}"
-  ssh_user_name                    = "${var.ssh_user_name}"
+  ssh_user_name                    = "${lookup(local.ssh_user_map,var.operating_system)}"
   operating_system                 = "${var.operating_system}"
   operating_system_version         = "${var.operating_system_version}"
   aws_auth_access_key              = "${aws_iam_access_key.vault.id}"
   aws_auth_secret_key              = "${aws_iam_access_key.vault.secret}"
   hashistack_instance_arn          = "${module.hashistack-instance-profile.hashistack_instance_arn}"
+  vanity_domain                    = "${var.root_domain}"
+}
+
+module "mysql-database" {
+  source                   = "./mysql-database"
+  owner                    = "${var.owner}"
+  ttl                      = "${var.ttl}"
+  region                   = "us-east-1"
+  cluster_name             = "${random_id.environment_name.hex}-us-east-1"
+  environment_name         = "${random_id.environment_name.hex}"
+  ssh_key_name             = "${random_id.environment_name.hex}-database"
+  instance_profile         = "${module.hashistack-instance-profile.policy}"
+  public_key_data          = "${module.ssh.public_key_data}"
+  private_key_data         = "${module.ssh.private_key_data}"
+  subnet_ids               = "${module.vpc-east.public_subnets}"
+  vpc_id                   = "${module.vpc-east.vpc_id}"
+  ssh_user_name            = "${var.ssh_user_name}"
+  operating_system         = "${var.operating_system}"
+  operating_system_version = "${var.operating_system_version}"
+  vanity_domain            = "${var.root_domain}"
 }

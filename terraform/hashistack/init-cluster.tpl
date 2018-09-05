@@ -129,7 +129,6 @@ sudo cat << 'EOF' > /tmp/nomad-vault.hcl.tpl
 vault {
   enabled = true
   address = "http://active.vault.service.consul:8200"
-  token = "{{ key "service/vault/${local_region}-root-token@us-east-1" }}"
 }
 EOF
 

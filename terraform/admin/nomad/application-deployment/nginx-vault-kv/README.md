@@ -1,21 +1,13 @@
-# Nomad-Vault Nginx Key/Value 
+## Nginx Deployment (Template Example) with Vault secret
+Deploy nginx on Nomad. Uses Vault for secrets deployment
 
-### TLDR;
 ```bash
-vagrant@node1:/vagrant/vault-examples/nginx/KeyValue$ ./kv_vault_setup.sh
-Successfully authenticated! You are now logged in.
-token: 25bf4150-94a4-7292-974c-9c3fa4c8ee53
-token_duration: 0
-token_policies: [root]
-Success! Data written to: secret/test
-Policy 'test' written.
-
-vagrant@node1:/vagrant/vault-examples/nginx/KeyValue$ nomad run nginx-kv-secret.nomad
-
-# in your browser goto (Runs on clients on static port 8080):
-http://localhost:8080/nginx-secret/
-#Good morning. secret: Live demos rock!!!
-
+$ chmod +x kv_vault_setup.sh
+$ ./kv_vault_setup.sh
+$ nomad run nginx-kv-secret.nomad
 ```
+Check results using Fabio. 
 
-#Guide: TODO
+```bash
+http://ak-hs-9a0ff0bb-fabio-4220c9210d8e0876.elb.us-east-1.amazonaws.com:9999/nginx-secret/
+```

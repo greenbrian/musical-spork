@@ -38,7 +38,7 @@ job "nginx" {
             ssl_certificate /etc/nginx/ssl/nginx.key;
             ssl_certificate_key /etc/nginx/ssl/nginx.key;
 
-            location / {
+            location /nginx-secret {
               root /local/data/;
             }
           }
@@ -71,7 +71,7 @@ job "nginx" {
 {{ end }}
         EOH
 
-        destination = "local/data/index.html"
+        destination = "local/data/nginx-secret/index.html"
       }
 
       resources {
@@ -90,8 +90,8 @@ job "nginx" {
 
       service {
         name = "nginx"
-        tags = [ "frontend","urlprefix-/nginx-pki" ]
-        port = "http"
+        tags = [ "frontend","urlprefix-/nginx-secret  proto=https tlsskipverify=true" ]
+        port = "https"
         check {
           type     = "tcp"
           interval = "10s"
