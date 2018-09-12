@@ -49,6 +49,10 @@ disable_remote_exec = false
 connect {
   enabled = true
 }
+acl_datacenter = "us-east-1"
+acl_master_token = "mybigsecret"
+acl_default_policy = "allow"
+acl_down_policy = "extend-cache"
 EOF
 
 chown consul:consul /etc/consul.d/consul.hcl
