@@ -1,5 +1,5 @@
 job "haproxy" {
-  datacenters = ["us-east-1"]
+  datacenters = ["us-east-1a","us-east-1b","us-east-1c"]
   type = "service"
   update { stagger = "10s"
     max_parallel = 1

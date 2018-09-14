@@ -405,3 +405,19 @@ then
   # vaultl login -method=userpass username=bob password=vault
   # vault kv put secret/bob_smith/test foo=ba
 fi
+
+# Add Consul Prepared Query Template for Auto Service Failover and scoped query to target tags
+for region in ${local_region} ${remote_regions}; do
+  curl -s --header "Content-Type: application/json" --request POST \
+      --data '{ "Name": "", "Template": { "Type": "name_prefix_match" },"Service": { "Service": "$${name.full}","Failover": { "NearestN": 3  }, "OnlyPassing": true  } }' \
+      http://127.0.0.1:8500/v1/query?dc=$${region}
+  curl -s --header "Content-Type: application/json" --request POST \
+      --data '{ "Name": "profityellow", "Service": { "Service": "profitapp", "Failover": { "NearestN": 3 }, "OnlyPassing": true, "Near": "", "Tags": ["profit", "yellow"], "NodeMeta": null }, "DNS": { "TTL": "" }}' \
+      http://127.0.0.1:8500/v1/query?dc=$${region}
+done
+
+# Add Consul KV data for profitapp prepared query demo
+for region in ${local_region} ${remote_regions}; do
+  curl --header "Content-Type: application/json" -X PUT --data 'apple' -s http://127.0.0.1:8500/v1/kv/service/profitapp/yellow/fruit?dc=$${region}
+  curl --header "Content-Type: application/json" -X PUT --data 'orange' -s http://127.0.0.1:8500/v1/kv/service/profitapp/magenta/fruit?dc=$${region}
+done

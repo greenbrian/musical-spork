@@ -6,12 +6,12 @@
   },
   "builders": [
     {
-      "name": "amazon-ebs-rhel-7.3-systemd",
+      "name": "amazon-ebs-rhel-7.5-systemd",
       "type": "amazon-ebs",
       "access_key": "{{ user `aws_access_key_id` }}",
       "secret_key": "{{ user `aws_secret_access_key` }}",
       "region": "{{ user `aws_region` }}",
-      "spot_price_auto_product": "Linux/UNIX (Amazon VPC)",
+      "spot_price": "0",
       "force_deregister": true,
       "force_delete_snapshot": true,
       "ssh_pty": true,
@@ -20,7 +20,7 @@
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
-          "name": "*RHEL-7.3_HVM_GA-*",
+          "name": "*RHEL-7.5_HVM_GA-*",
           "root-device-type": "ebs"
         },
         "owners": ["309956199498"],
@@ -30,17 +30,17 @@
       "ssh_timeout": "5m",
       "ami_virtualization_type": "hvm",
       "ami_name": "hashistack-image-rhel-{{isotime \"2006-01-02-03-04\"}}",
-      "ami_description": "HashiStack Image - RHEL 7.3",
+      "ami_description": "HashiStack Image - RHEL 7.5",
       "ami_regions": ["us-east-1", "us-east-2", "us-west-2"],
       "tags": {
-        "Name": "HashiStack RHEL 7.3 Image {{ user `release_version` }}: Consul v{{ user `consul_version` }} Vault v{{ user `vault_version` }} Nomad v{{ user `nomad_version` }}",
+        "Name": "HashiStack RHEL 7.5 Image {{ user `release_version` }}: Consul v{{ user `consul_version` }} Vault v{{ user `vault_version` }} Nomad v{{ user `nomad_version` }}",
         "System": "HashiStack",
         "Product": "HashiStack",
         "Consul-Version": "{{ user `consul_version` }}",
         "Vault-Version": "{{ user `vault_version` }}",
         "Nomad-Version": "{{ user `nomad_version` }}",
         "OS": "rhel",
-        "OS-Version": "7.3"
+        "OS-Version": "7.5"
       }
     },
     {
@@ -49,6 +49,7 @@
       "access_key": "{{ user `aws_access_key_id` }}",
       "secret_key": "{{ user `aws_secret_access_key` }}",
       "region": "{{ user `aws_region` }}",
+      "spot_price": "auto",
       "spot_price_auto_product": "Linux/UNIX (Amazon VPC)",
       "force_deregister": true,
       "force_delete_snapshot": true,
@@ -87,6 +88,7 @@
       "access_key": "{{ user `aws_access_key_id` }}",
       "secret_key": "{{ user `aws_secret_access_key` }}",
       "region": "{{ user `aws_region` }}",
+      "spot_price": "auto",
       "spot_price_auto_product": "Linux/UNIX (Amazon VPC)",
       "force_deregister": true,
       "force_delete_snapshot": true,
@@ -174,7 +176,7 @@
     {
       "type": "shell",
       "script": "scripts/rhel.sh",
-      "only": ["amazon-ebs-rhel-7.3-systemd"]
+      "only": ["amazon-ebs-rhel-7.5-systemd"]
     },
     {
       "type": "shell",
