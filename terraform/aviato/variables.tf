@@ -9,6 +9,7 @@ variable "instance_profile" {}
 variable "owner" {}
 variable "ttl" {}
 variable "image_release" {}
+variable "nginx_count" {}
 
 variable "subnet_ids" {
   type = "list"
@@ -37,8 +38,4 @@ variable "ssh_user_name" {
 variable "vanity_domain" {
   default     = "none"
   description = "Vanity domain name to use"
-}
-
-output "db_address" {
-  value = "${var.vanity_domain == "none" ? "${aws_instance.db.public_ip}" : "${element(concat(aws_route53_record.db.*.name, list("")), 0)}"}"
 }

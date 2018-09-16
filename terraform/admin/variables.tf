@@ -8,6 +8,7 @@ variable "region" {}
 variable "instance_profile" {}
 variable "owner" {}
 variable "ttl" {}
+variable "image_release" {}
 
 variable "subnet_ids" {
   type = "list"
@@ -36,6 +37,10 @@ variable "hashistack_instance_arn" {
   description = "AWS IAM role ARN value for Hashistack node"
 }
 
+variable "aviato_instance_arn" {
+  description = "AWS IAM role ARN value for aviato node"
+}
+
 variable "operating_system" {
   default     = "rhel"
   description = "Operating system type, supported options are rhel and ubuntu"
@@ -61,15 +66,7 @@ variable "vault_auto_replication_setup" {
   description = "Enable or disable automatic replication configuration between Vault clusters. True or false, string."
 }
 
-output "ssh_info" {
-  value = "${data.template_file.format_ssh.rendered}"
-}
-
 variable "vanity_domain" {
   default     = "none"
   description = "Vanity domain name to use"
-}
-
-output "consul-ui" {
-  value = "${var.vanity_domain == "none" ? "http://${aws_instance.admin.public_ip}:8500/ui" : "http://${element(concat(aws_route53_record.consul.*.name, list("")), 0)}:8500/ui"}"
 }

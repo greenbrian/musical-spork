@@ -66,11 +66,12 @@ systemd_files() {
   sudo chmod 0664 $2/$1
 }
 systemd_files consul.service ${SYSTEMD_DIR}
+systemd_files consul-template.service ${SYSTEMD_DIR}
 systemd_files consul-online.service ${SYSTEMD_DIR}
 systemd_files consul-online.target ${SYSTEMD_DIR}
 systemd_files nomad.service ${SYSTEMD_DIR}
 systemd_files vault.service ${SYSTEMD_DIR}
-systemd_files vault-secure-intro.service ${SYSTEMD_DIR}
+systemd_files nomad-token-secure-intro.service ${SYSTEMD_DIR}
 
 sudo cp /tmp/files/consul-online.sh /usr/bin/consul-online.sh
 sudo chmod +x /usr/bin/consul-online.sh
@@ -81,6 +82,12 @@ sudo chmod +x /usr/bin/aws-iam-login.sh
 
 sudo cp /tmp/files/aws-iam-login-cleanup.sh /usr/bin/aws-iam-login-cleanup.sh
 sudo chmod +x /usr/bin/aws-iam-login-cleanup.sh
+
+sudo cp /tmp/files/check_mem.sh /usr/bin/check_mem.sh
+sudo chmod +x /usr/bin/check_mem.sh
+
+sudo cp /tmp/files/check_cpu.sh /usr/bin/check_cpu.sh
+sudo chmod +x /usr/bin/check_cpu.sh
 
 echo "Setup Hashistack profile"
 cat <<PROFILE | sudo tee /etc/profile.d/hashistack.sh
@@ -97,3 +104,4 @@ echo "Allow consul sudo access for echo, tee, cat, sed, and systemctl"
 cat <<SUDOERS | sudo tee /etc/sudoers.d/consul
 consul ALL=(ALL) NOPASSWD: /usr/bin/echo, /usr/bin/tee, /usr/bin/cat, /usr/bin/sed, /usr/bin/systemctl, /bin/systemctl
 SUDOERS
+

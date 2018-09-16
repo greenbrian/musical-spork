@@ -4,10 +4,7 @@ set -e
 set -o pipefail
 
 VAULT_ADDR="http://active.vault.service.consul:8200"
-IAM_ROLE_NAME="test-role-iam"
 VAULT_HEADER_VALUE=""
-VAULT_TOKEN_FILE_PATH=/secrets
-VAULT_TOKEN_FILE=${VAULT_TOKEN_FILE_PATH}/nomad-server-token
 VAULT_LOGIN_RESPONSE=/tmp/response
 
 if hash vault 2>/dev/null; then
@@ -32,11 +29,11 @@ token_fetch() {
 
 until [ "$(token_fetch)" -eq "0" ]
 do
-  echo "Waiting for Vault token for Nomad.."
+  echo "Waiting for Vault token..."
   sleep 5
 done
 
-echo "Vault token for Nomad successfully obtained"
+echo "Vault token successfully obtained"
 token=$(jq -r .auth.client_token $VAULT_LOGIN_RESPONSE)
 echo "VAULT_TOKEN=$token" > $VAULT_TOKEN_FILE
 rm -f $VAULT_LOGIN_RESPONSE

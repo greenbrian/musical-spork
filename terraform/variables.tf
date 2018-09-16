@@ -7,6 +7,11 @@ variable "ttl" {
   description = "Tag indicating time to live for this cloud environment"
 }
 
+variable "image_release" {
+  default     = "stable"
+  description = "machine metadata (ami tag etc) indicating image version; test, beta, stable etc"
+}
+
 variable "env_name" {
   description = "Tag indicating environment name"
 }

@@ -5,6 +5,9 @@ After=consul-online.target
 
 [Service]
 Type=oneshot
+Environment="IAM_ROLE_NAME=nomad"
+Environment="VAULT_TOKEN_FILE_PATH=/secrets"
+Environment="VAULT_TOKEN_FILE=/secrets/nomad-server-token"
 ExecStart=/usr/bin/aws-iam-login.sh
 RemainAfterExit=true
 ExecStop=/usr/bin/aws-iam-login-cleanup.sh
