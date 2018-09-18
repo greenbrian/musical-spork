@@ -91,6 +91,11 @@ client {
     "driver.raw_exec.enable" = "1"
   }
 }
+	
+vault {	
+  enabled = true	
+  address = "http://active.vault.service.consul:8200"		
+}	
 EOF
 
 # start nomad once it is configured correctly
