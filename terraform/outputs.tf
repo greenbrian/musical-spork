@@ -33,3 +33,15 @@ output "nomad-ui-us-east-1" {
 output "fabio-router-haproxy" {
   value = "${module.hashistack-us-east.fabio-router}/haproxy"
 }
+
+output "private_key_data" {
+  value = "${module.ssh.private_key_data}"
+}
+
+output "ssh_key_name" {
+  value = "${module.ssh.ssh_key_name}"
+}
+
+output "public_key_data" {
+  value = "${module.ssh.public_key_data}"
+}
