@@ -14,7 +14,7 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-data "aws_iam_policy_document" "hashistack" {
+data "aws_iam_policy_document" "aviato" {
   statement {
     sid       = "AllowSelfAssembly"
     effect    = "Allow"
@@ -35,32 +35,20 @@ data "aws_iam_policy_document" "hashistack" {
       "iam:GetRole",
     ]
   }
+}
 
-  statement {
-    actions = [
-      "kms:DescribeKey",
-      "kms:Encrypt",
-      "kms:Decrypt",
-    ]
-
-    resources = [
-      "${var.kms_arn}",
-    ]
-  }
-}  
-
-resource "aws_iam_role" "hashistack" {
-  name               = "hashistack-${var.environment_name}"
+resource "aws_iam_role" "aviato" {
+  name               = "aviato-${var.environment_name}"
   assume_role_policy = "${data.aws_iam_policy_document.assume_role.json}"
 }
 
-resource "aws_iam_role_policy" "hashistack" {
-  name   = "hashistack-${var.environment_name}-SelfAssembly"
-  role   = "${aws_iam_role.hashistack.id}"
-  policy = "${data.aws_iam_policy_document.hashistack.json}"
+resource "aws_iam_role_policy" "aviato" {
+  name   = "aviato-${var.environment_name}-SelfAssembly"
+  role   = "${aws_iam_role.aviato.id}"
+  policy = "${data.aws_iam_policy_document.aviato.json}"
 }
 
-resource "aws_iam_instance_profile" "hashistack" {
-  name = "hashistack-${var.environment_name}"
-  role = "${aws_iam_role.hashistack.name}"
+resource "aws_iam_instance_profile" "aviato" {
+  name = "aviato-${var.environment_name}"
+  role = "${aws_iam_role.aviato.name}"
 }

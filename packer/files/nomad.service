@@ -1,7 +1,7 @@
 [Unit]
 Description=Nomad Agent
-Requires=consul-online.target vault-secure-intro.service
-After=consul-online.target vault-secure-intro.service
+Requires=consul-online.target nomad-token-secure-intro.service
+After=consul-online.target nomad-token-secure-intro.service
 
 [Service]
 EnvironmentFile=-/secrets/nomad-server-token

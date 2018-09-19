@@ -6,7 +6,9 @@ sudo yum-config-manager --enable rhui-REGION-rhel-server-releases-optional
 sudo yum-config-manager --enable rhui-REGION-rhel-server-supplementary
 sudo yum-config-manager --enable rhui-REGION-rhel-server-extras
 sudo yum -y check-update
-sudo yum install -q -y wget unzip dnsmasq bind-utils ruby rubygems ntp git ca-certificates vim-enhanced
+sudo rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+sudo yum install -q -y wget unzip dnsmasq bind-utils ruby rubygems \
+  ntp git ca-certificates vim-enhanced haproxy nginx
 sudo systemctl start ntpd.service
 sudo systemctl enable ntpd.service
 sudo systemctl stop firewalld.service

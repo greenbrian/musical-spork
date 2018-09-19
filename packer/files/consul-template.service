@@ -1,0 +1,15 @@
+[Unit]
+Description=consul-template agent
+Requires=consul-online.target
+After=consul-online.target
+
+[Service]
+Restart=always
+RestartSec=5
+ExecStart=/usr/local/bin/consul-template -config=/etc/consul-template.d
+KillSignal=SIGINT
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

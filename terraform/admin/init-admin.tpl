@@ -5,7 +5,7 @@ exec 1> >(logger -s -t $(basename $0)) 2>&1
 instance_id="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)"
 local_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)"
 public_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)"
-new_hostname="hashistack-$${instance_id}"
+new_hostname="hashistack-admin"
 
 echo "${private_key}" > /home/${ssh_user_name}/.ssh/id_rsa
 chmod 0700 /home/${ssh_user_name}/.ssh
@@ -14,6 +14,7 @@ chown ${ssh_user_name}:${ssh_user_name} /home/${ssh_user_name}/.ssh/id_rsa
 
 # set the hostname (before starting consul and nomad)
 hostnamectl set-hostname "$${new_hostname}"
+echo "127.0.0.1 $(hostname)" | sudo tee --append /etc/hosts
 
 
 cat <<EOF>> /etc/consul.d/consul.hcl
@@ -30,19 +31,6 @@ EOF
 
 chown consul:consul /etc/consul.d/consul.hcl
 systemctl start consul
-
-cat << EOF > /etc/systemd/system/consul-template.service
-[Unit]
-Description=consul-template agent
-Requires=network-online.target
-After=network-online.target consul.service
-[Service]
-Restart=on-failure
-ExecStart=/usr/local/bin/consul-template -config=/etc/consul-template.d/consul-template.json
-KillSignal=SIGINT
-[Install]
-WantedBy=multi-user.target
-EOF
 
 systemctl daemon-reload
 
@@ -189,7 +177,7 @@ curl \
     http://$${LOCAL_ACTIVE_VAULT}:8200/v1/auth/aws/config/client
 
 echo "Configure AWS role in Vault for AWS authentication method"
-test_role_payload=$(cat <<EOF
+nomad_role_payload=$(cat <<EOF
 {
   "auth_type": "iam",
   "bound_iam_principal_arn": "${hashistack_instance_arn}",
@@ -203,8 +191,27 @@ curl \
     --silent \
     --header "X-Vault-Token: $${VAULT_TOKEN}" \
     --request POST \
-    --data "$${test_role_payload}" \
-    http://$${LOCAL_ACTIVE_VAULT}:8200/v1/auth/aws/role/test-role-iam
+    --data "$${nomad_role_payload}" \
+    http://$${LOCAL_ACTIVE_VAULT}:8200/v1/auth/aws/role/nomad
+
+echo "Configure AWS role in Vault for AWS authentication method"
+aviato_role_payload=$(cat <<EOF
+{
+  "auth_type": "iam",
+  "bound_iam_principal_arn": "${aviato_instance_arn}",
+  "policies": "aviato",
+  "max_ttl": "500h"
+}
+EOF
+)
+
+curl \
+    --silent \
+    --header "X-Vault-Token: $${VAULT_TOKEN}" \
+    --request POST \
+    --data "$${aviato_role_payload}" \
+    http://$${LOCAL_ACTIVE_VAULT}:8200/v1/auth/aws/role/aviato
+
 
 
 echo "Running Fabio load balancer as Nomad job"
@@ -330,6 +337,81 @@ echo '
 }' > iam.policy
 vault write aws/roles/s3access policy=@iam.policy
 
+#### Aviato demo
+# write some basic consul kv pairs
+curl -fX PUT 127.0.0.1:8500/v1/kv/aviato/color/favorite -d YELLOW
+curl -fX PUT 127.0.0.1:8500/v1/kv/aviato/number/huge -d 99999
+
+# enable kv path for demo
+vault secrets enable -version=1 -path=aviato kv
+
+# write some Vault secrets
+vault kv put aviato/info User1SSN="200-23-9930" User2SSN="000-00-0002" ttl=60s
+
+mkdir -p /tmp/certs/
+
+# Mount Root CA and generate cert
+vault secrets enable -path aviato-root pki
+vault secrets tune -max-lease-ttl=87600h aviato-root
+vault write -format=json aviato-root/root/generate/internal \
+common_name="aviato-root" ttl=87600h | tee \
+>(jq -r .data.certificate > /tmp/certs/ca.pem) \
+>(jq -r .data.issuing_ca > /tmp/certs/issuing_ca.pem) \
+>(jq -r .data.private_key > /tmp/certs/ca-key.pem)
+
+# Mount Intermediate and set cert
+vault secrets enable -path aviato-intermediate pki
+vault secrets tune -max-lease-ttl=87600h aviato-intermediate
+vault write -format=json aviato-intermediate/intermediate/generate/internal \
+  common_name="aviato-intermediate" ttl=43800h | tee \
+  >(jq -r .data.csr > /tmp/certs/aviato-intermediate.csr) \
+  >(jq -r .data.private_key > /tmp/certs/aviato-intermediate.pem)
+
+# Sign the intermediate certificate and set it
+vault write -format=json aviato-root/root/sign-intermediate \
+  csr=@/tmp/certs/aviato-intermediate.csr \
+  common_name="aviato-intermediate" ttl=43800h | tee \
+  >(jq -r .data.certificate > /tmp/certs/aviato-intermediate.pem) \
+  >(jq -r .data.issuing_ca > /tmp/certs/aviato-intermediate_issuing_ca.pem)
+vault write aviato-intermediate/intermediate/set-signed \
+  certificate=@/tmp/certs/aviato-intermediate.pem
+
+# Generate the roles
+vault write aviato-intermediate/roles/aviato-dot-com allow_any_name=true max_ttl="1m"
+
+echo "
+  path \"aviato-intermediate/issue*\" {
+    capabilities = [\"create\",\"update\"]
+  }
+  path \"aviato/info*\" {
+    capabilities = [\"read\"]
+  }
+  path \"auth/token/renew\" {
+    capabilities = [\"update\"]
+  }
+  path \"auth/token/renew-self\" {
+    capabilities = [\"update\"]
+  }
+  " | vault policy-write aviato -
+
+echo "Configure AWS aviato role in Vault for AWS authentication method"
+aviato_role_payload=$(cat <<EOF
+{
+  "auth_type": "iam",
+  "bound_iam_principal_arn": "${aviato_instance_arn}",
+  "policies": "aviato",
+  "max_ttl": "500h"
+}
+EOF
+)
+
+curl \
+    --silent \
+    --header "X-Vault-Token: $${VAULT_TOKEN}" \
+    --request POST \
+    --data "$${aviato_role_payload}" \
+    http://$${LOCAL_ACTIVE_VAULT}:8200/v1/auth/aws/role/aviato
+
 
 #SENTINEL
 sentinel_demo() {
@@ -421,3 +503,6 @@ for region in ${local_region} ${remote_regions}; do
   curl --header "Content-Type: application/json" -X PUT --data 'apple' -s http://127.0.0.1:8500/v1/kv/service/profitapp/yellow/fruit?dc=$${region}
   curl --header "Content-Type: application/json" -X PUT --data 'orange' -s http://127.0.0.1:8500/v1/kv/service/profitapp/magenta/fruit?dc=$${region}
 done
+
+# cleanup Vault details from Consul kv
+curl -sfX DELETE  http://127.0.0.1:8500/v1/kv/service/vault?recurse

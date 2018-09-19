@@ -16,6 +16,11 @@ data aws_ami "hashistack" {
     name   = "tag:OS-Version"
     values = ["${var.operating_system_version}"]
   }
+
+  filter {
+    name   = "tag:Release"
+    values = ["${var.image_release}"]
+  }
 }
 
 resource "aws_key_pair" "main" {
@@ -74,6 +79,7 @@ data "template_file" "admin" {
     aws_auth_access_key              = "${var.aws_auth_access_key}"
     aws_auth_secret_key              = "${var.aws_auth_secret_key}"
     hashistack_instance_arn          = "${var.hashistack_instance_arn}"
+    aviato_instance_arn              = "${var.aviato_instance_arn}"
   }
 }
 

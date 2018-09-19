@@ -29,6 +29,12 @@ module "hashistack-instance-profile" {
   kms_arn          = "${aws_kms_key.vault.arn}"
 }
 
+module "aviato-instance-profile" {
+  region           = "us-east-1"
+  source           = "./instance-policy-aviato"
+  environment_name = "${random_id.environment_name.hex}"
+}
+
 module "vpc-east" {
   providers = {
     aws = "aws.east"
@@ -88,6 +94,7 @@ module "hashistack-us-east" {
   environment_name         = "${random_id.environment_name.hex}"
   remote_regions           = ["us-west-2"]
   instance_profile         = "${module.hashistack-instance-profile.policy}"
+  image_release            = "${var.image_release}"
   ssh_key_name             = "${random_id.environment_name.hex}-us-east"
   public_key_data          = "${module.ssh.public_key_data}"
   private_key_data         = "${module.ssh.private_key_data}"
@@ -110,6 +117,7 @@ module "hashistack-us-west" {
   environment_name         = "${random_id.environment_name.hex}"
   remote_regions           = ["us-east-1"]
   instance_profile         = "${module.hashistack-instance-profile.policy}"
+  image_release            = "${var.image_release}"
   ssh_key_name             = "${random_id.environment_name.hex}-us-west"
   public_key_data          = "${module.ssh.public_key_data}"
   private_key_data         = "${module.ssh.private_key_data}"
@@ -133,6 +141,7 @@ module "admin-east" {
   remote_regions                   = ["us-west-2"]
   ssh_key_name                     = "${random_id.environment_name.hex}-admin"
   instance_profile                 = "${module.hashistack-instance-profile.policy}"
+  image_release                    = "${var.image_release}"
   public_key_data                  = "${module.ssh.public_key_data}"
   private_key_data                 = "${module.ssh.private_key_data}"
   subnet_ids                       = "${module.vpc-east.public_subnets}"
@@ -145,6 +154,7 @@ module "admin-east" {
   aws_auth_access_key              = "${aws_iam_access_key.vault.id}"
   aws_auth_secret_key              = "${aws_iam_access_key.vault.secret}"
   hashistack_instance_arn          = "${module.hashistack-instance-profile.hashistack_instance_arn}"
+  aviato_instance_arn              = "${module.aviato-instance-profile.aviato_instance_arn}"
   vanity_domain                    = "${var.root_domain}"
 }
 
@@ -176,6 +186,28 @@ module "mysql-database" {
   environment_name         = "${random_id.environment_name.hex}"
   ssh_key_name             = "${random_id.environment_name.hex}-database"
   instance_profile         = "${module.hashistack-instance-profile.policy}"
+  image_release            = "${var.image_release}"
+  public_key_data          = "${module.ssh.public_key_data}"
+  private_key_data         = "${module.ssh.private_key_data}"
+  subnet_ids               = "${module.vpc-east.public_subnets}"
+  vpc_id                   = "${module.vpc-east.vpc_id}"
+  ssh_user_name            = "${var.ssh_user_name}"
+  operating_system         = "${var.operating_system}"
+  operating_system_version = "${var.operating_system_version}"
+  vanity_domain            = "${var.root_domain}"
+}
+
+module "aviato" {
+  source                   = "./aviato"
+  owner                    = "${var.owner}"
+  ttl                      = "${var.ttl}"
+  region                   = "us-east-1"
+  nginx_count              = "${var.nginx_count}"
+  cluster_name             = "${random_id.environment_name.hex}-us-east-1"
+  environment_name         = "${random_id.environment_name.hex}"
+  ssh_key_name             = "${random_id.environment_name.hex}-aviato"
+  instance_profile         = "${module.aviato-instance-profile.policy}"
+  image_release            = "${var.image_release}"
   public_key_data          = "${module.ssh.public_key_data}"
   private_key_data         = "${module.ssh.private_key_data}"
   subnet_ids               = "${module.vpc-east.public_subnets}"
