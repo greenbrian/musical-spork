@@ -1,6 +1,5 @@
 job "docs" {
-  datacenters = ["us-east-1"]
-
+  datacenters = ["us-east-1a","us-east-1b","us-east-1c"]
   group "example" {
     task "server" {
       driver = "exec"

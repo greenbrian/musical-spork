@@ -2,6 +2,10 @@ output "admin-ssh-us-east-1" {
   value = "${module.admin-east.ssh_info}"
 }
 
+output "client-ssh-us-west-2" {
+  value = "${module.client-west.ssh_info}"
+}
+
 output "mysql-database-us-east-1" {
   value = "${module.mysql-database.db_address}"
 }

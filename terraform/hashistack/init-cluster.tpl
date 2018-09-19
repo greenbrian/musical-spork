@@ -3,6 +3,7 @@
 exec 1> >(logger -s -t $(basename $0)) 2>&1
 
 instance_id="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)"
+availability_zone="$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)"
 local_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)"
 public_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)"
 new_hostname="hashistack-$${instance_id}"
@@ -59,8 +60,8 @@ chown consul:consul /etc/consul.d/consul.hcl
 systemctl start consul
 
 cat <<EOF>> /etc/nomad.d/nomad.hcl
-datacenter = "${local_region}"
-region = "${nomad_region}"
+datacenter = "$${availability_zone}"
+region = "${local_region}"
 data_dir     = "/opt/nomad/data"
 log_level    = "INFO"
 enable_debug = true
@@ -133,10 +134,9 @@ sudo cat << 'EOF' > /tmp/nomad-vault.hcl.tpl
 vault {
   enabled = true
   address = "http://active.vault.service.consul:8200"
+  create_from_role = "nomad-cluster"
 }
 EOF
 
 sudo systemctl enable consul-template.service
 sudo systemctl start consul-template.service
-
-
