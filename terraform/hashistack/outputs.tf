@@ -1,6 +1,5 @@
-
 output "vault-ui" {
-  value = "${var.vanity_domain == "none" ? "http://${aws_lb.vault.dns_name}:8200/ui" : "http://${element(concat(aws_route53_record.vault.*.name, list("")), 0)}:8200/ui"}"
+  value = "${var.vanity_domain == "none" ? "http://${aws_lb.vault.dns_name}:8200/ui/" : "http://${element(concat(aws_route53_record.vault.*.name, list("")), 0)}:8200/ui/"}"
 }
 
 output "fabio-ui" {

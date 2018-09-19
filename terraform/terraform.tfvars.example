@@ -4,7 +4,7 @@ env_name = "hashistack"
 
 # rhel option
 operating_system           = "rhel"
-operating_system_version   = "7.3"
+operating_system_version   = "7.5"
 
 # ubuntu option - work in progress
 #operating_system           = "ubuntu"
@@ -27,4 +27,4 @@ vault_cloud_unseal           = "true"
 
 # custom URL to utilize - this is optional
 # the domain must already be registered in AWS
-root_domain = "this-demo.rocks"
+#root_domain = "this-demo.rocks"

@@ -2,6 +2,10 @@ output "admin-ssh-us-east-1" {
   value = "${module.admin-east.ssh_info}"
 }
 
+output "client-ssh-us-west-2" {
+  value = "${module.client-west.ssh_info}"
+}
+
 output "mysql-database-us-east-1" {
   value = "${module.mysql-database.db_address}"
 }
@@ -60,4 +64,16 @@ output "haproxy_vault_frontend" {
 
 output "secrets_page" {
   value = "${module.aviato.haproxy_web_frontend_secrets}"
+}
+
+output "private_key_data" {
+  value = "${module.ssh.private_key_data}"
+}
+
+output "ssh_key_name" {
+  value = "${module.ssh.ssh_key_name}"
+}
+
+output "public_key_data" {
+  value = "${module.ssh.public_key_data}"
 }

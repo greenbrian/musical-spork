@@ -34,8 +34,9 @@ done
 
 echo "Installing Docker with RHEL Workaround"
 sudo yum -yq install policycoreutils-python yum-utils device-mapper-persistent-data lvm2
-sudo yum -y remove docker-engine-selinux container-selinux
+sudo yum -y remove docker docker-client docker-client-latest docker-common docker-latest \
+  docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux \
+  docker-engine container-selinux
 sudo yum-config-manager -y --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 sudo yum install -y --setopt=obsoletes=0 \
-  docker-ce-17.03.2.ce-1.el7.centos.x86_64 \
-  docker-ce-selinux-17.03.2.ce-1.el7.centos.noarch
+  docker-ce-18.06.1.ce-3.el7.x86_64

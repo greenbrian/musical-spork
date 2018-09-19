@@ -1,6 +1,5 @@
 job "example" {
-  datacenters = ["us-east-1"]
-
+  datacenters = ["us-east-1a","us-east-1b","us-east-1c"]
   
   type = "service"
 

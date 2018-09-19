@@ -3,6 +3,7 @@
 exec 1> >(logger -s -t $(basename $0)) 2>&1
 
 instance_id="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)"
+availability_zone="$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)"
 local_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)"
 public_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)"
 new_hostname="hashistack-$${public_ipv4}"
@@ -48,14 +49,18 @@ disable_remote_exec = false
 connect {
   enabled = true
 }
+acl_datacenter = "us-east-1"
+acl_master_token = "mybigsecret"
+acl_default_policy = "allow"
+acl_down_policy = "extend-cache"
 EOF
 
 chown consul:consul /etc/consul.d/consul.hcl
 systemctl start consul
 
 cat <<EOF>> /etc/nomad.d/nomad.hcl
-datacenter = "${local_region}"
-region = "${nomad_region}"
+datacenter = "$${availability_zone}"
+region = "${local_region}"
 data_dir     = "/opt/nomad/data"
 log_level    = "INFO"
 enable_debug = true

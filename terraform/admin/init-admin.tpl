@@ -413,6 +413,96 @@ curl \
     http://$${LOCAL_ACTIVE_VAULT}:8200/v1/auth/aws/role/aviato
 
 
+#SENTINEL
+sentinel_demo() {
+cat <<EOF>> /tmp/business-hours.sentinel
+import "time"
+workdays = rule {
+    time.now.weekday > 0 and time.now.weekday < 6
+}
+workhours = rule {
+    time.now.hour > 9 and time.now.hour < 17
+}
+main = rule {
+    workdays and workhours
+}
+EOF
+
+cat <<EOF>> /tmp/cidr-check.sentinel
+import "sockaddr"
+import "strings"
+precond = rule {
+    request.operation in ["create", "update", "delete", "read"] and
+    strings.has_prefix(request.path, "secret/")
+}
+cidrcheck = rule {
+    sockaddr.is_contained(request.connection.remote_addr, "10.0.101.0/24")
+}
+main = rule when precond {
+    cidrcheck
+}
+EOF
+
+POLICY=$(base64 /tmp/business-hours.sentinel)
+vault write sys/policies/egp/business-hours-check \
+        policy="$${POLICY}" \
+        paths="secret/*" \
+        enforcement_level="hard-mandatory"
+
+ POLICY=$(base64 /tmp/cidr-check.sentinel)
+ vault write sys/policies/egp/cidr-check \
+        policy="$${POLICY}" \
+        paths="secret/cidr" \
+        enforcement_level="advisory"
+vault kv put secret/test foo=bar
+vault kv put secret/cidr foo=bar
+}
+#sentinel_demo
+
+
+vault --version | grep 0.11 ; if [ $? -eq 0 ] 
+then 
+  #Namespaces
+  vault namespace create engineering
+  vault namespace create -namespace=engineering development
+  vault namespace create -namespace=engineering operations
+  r
+
+  #ACL Templating
+  echo '
+  path "secret/{{identity.entity.name}}/*" {
+    capabilities = [ "create", "update", "read", "delete", "list" ]
+  }
+  path "secret/" {
+    capabilities = ["list"]
+  }' | vault policy write user-tmpl -
+  vault write auth/userpass/users/bob password=vault 
+  vault auth list -format=json | jq -r '.["userpass/"].accessor' > accessor.txt  
+  vault write -format=json identity/entity name="bob_smith" policies="user-tmpl" \
+          | jq -r ".data.id" > entity_id.txt
+  vault write identity/entity-alias name="bob" \
+        canonical_id=$(cat entity_id.txt) \
+        mount_accessor=$(cat accessor.txt)
+  # USAGE
+  # vaultl login -method=userpass username=bob password=vault
+  # vault kv put secret/bob_smith/test foo=ba
+fi
+
+# Add Consul Prepared Query Template for Auto Service Failover and scoped query to target tags
+for region in ${local_region} ${remote_regions}; do
+  curl -s --header "Content-Type: application/json" --request POST \
+      --data '{ "Name": "", "Template": { "Type": "name_prefix_match" },"Service": { "Service": "$${name.full}","Failover": { "NearestN": 3  }, "OnlyPassing": true  } }' \
+      http://127.0.0.1:8500/v1/query?dc=$${region}
+  curl -s --header "Content-Type: application/json" --request POST \
+      --data '{ "Name": "profityellow", "Service": { "Service": "profitapp", "Failover": { "NearestN": 3 }, "OnlyPassing": true, "Near": "", "Tags": ["profit", "yellow"], "NodeMeta": null }, "DNS": { "TTL": "" }}' \
+      http://127.0.0.1:8500/v1/query?dc=$${region}
+done
+
+# Add Consul KV data for profitapp prepared query demo
+for region in ${local_region} ${remote_regions}; do
+  curl --header "Content-Type: application/json" -X PUT --data 'apple' -s http://127.0.0.1:8500/v1/kv/service/profitapp/yellow/fruit?dc=$${region}
+  curl --header "Content-Type: application/json" -X PUT --data 'orange' -s http://127.0.0.1:8500/v1/kv/service/profitapp/magenta/fruit?dc=$${region}
+done
+
 # cleanup Vault details from Consul kv
 curl -sfX DELETE  http://127.0.0.1:8500/v1/kv/service/vault?recurse
-

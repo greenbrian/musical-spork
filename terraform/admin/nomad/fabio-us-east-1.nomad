@@ -1,7 +1,7 @@
 
 job "fabio" {
-    region = "us-east"
-    datacenters = ["us-east-1"]
+    region = "us-east-1"
+    datacenters = ["us-east-1a"]
     type = "system"
     update {
         stagger = "5s"
