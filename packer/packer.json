@@ -42,7 +42,6 @@
         "OS": "rhel",
         "OS-Version": "7.5",
         "Release": "{{ user `release` }}"
-        "OS-Version": "7.5"
       }
     },
     {

@@ -99,7 +99,8 @@ client {
 	
 vault {	
   enabled = true	
-  address = "http://active.vault.service.consul:8200"		
+  address = "http://active.vault.service.consul:8200"
+  create_from_role = "nomad-cluster"
 }	
 EOF
 
