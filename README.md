@@ -20,7 +20,7 @@ This contains HashiCorp code to do the following:
 5. Execute Packer build
 ```
 cd packer
-packer build -var-file=vars.json -only=amazon-ebs-rhel-7.3-systemd  packer.json   
+packer build -var-file=vars.json -only=amazon-ebs-rhel-7.5-systemd  packer.json   
 ```
 
 ## Terraform usage

@@ -89,11 +89,14 @@ sudo chmod +x /usr/bin/check_mem.sh
 sudo cp /tmp/files/check_cpu.sh /usr/bin/check_cpu.sh
 sudo chmod +x /usr/bin/check_cpu.sh
 
+sudo cp /tmp/files/vault_setup.sh /usr/bin/vault_setup.sh
+sudo chmod +x /usr/bin/vault_setup.sh
+
 echo "Setup Hashistack profile"
 cat <<PROFILE | sudo tee /etc/profile.d/hashistack.sh
 export CONSUL_ADDR=http://127.0.0.1:8500
-export NOMAD_ADDR=http://127.0.0.1:4646
-export VAULT_ADDR=http://127.0.0.1:8200
+export NOMAD_ADDR="http://nomad-server.service.consul:4646"
+export VAULT_ADDR="http://active.vault.service.consul:8200"
 #export VAULT_TOKEN=root
 PROFILE
 
