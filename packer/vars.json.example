@@ -8,5 +8,6 @@
   "vault_zip": "/path/to/vault-enterprise_0.11.0+prem_linux_amd64.zip",
   "vault_version": "0.11.0"
   "username": "your-ssh-username",
-  "pubkey": "ssh-rsa AAAAB3NzaC1<<-- your public key goes here -->>IUzu4eGeAvSvdp/QFBtPoR37bLv"
+  "pubkey": "ssh-rsa AAAAB3NzaC1<<-- your public key goes here -->>IUzu4eGeAvSvdp/QFBtPoR37bLv",
+  "release": "stable"
 }
