@@ -17,7 +17,8 @@ This contains HashiCorp code to do the following:
 2. Copy packer/vars.json.example to packer/vars.json
 3. Configure variables local path to those binaries in packer/vars.json
 4. Ensure AWS credentials are exposed as environment variables
-5. Execute Packer build
+5. Expose AWS environment variables to avoid AMI copy timeouts. `export AWS_MAX_ATTEMPTS=60 && export AWS_POLL_DELAY_SECONDS=60`
+6. Execute Packer build
 ```
 cd packer
 packer build -var-file=vars.json -only=amazon-ebs-rhel-7.5-systemd  packer.json   
