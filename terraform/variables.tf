@@ -37,7 +37,7 @@ variable "operating_system" {
 }
 
 variable "operating_system_version" {
-  default     = "7.3"
+  default     = "7.5"
   description = "Operating system version, supported options are 7.3 for rhel, 16.04 for ubuntu"
 }
 
