@@ -1,0 +1,16 @@
+[Unit]
+Description=Vault Agent
+Requires=consul-online.target
+After=consul-online.target
+
+[Service]
+Restart=on-failure
+ExecStart=/usr/local/bin/vault agent -config /etc/vault-agent.d
+ExecStartPost=/bin/sh -c 'sed -i '1s/^/VAULT_TOKEN=/' /mnt/ramdisk/token'
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+User=vault-agent
+Group=vault-agent
+
+[Install]
+WantedBy=multi-user.target

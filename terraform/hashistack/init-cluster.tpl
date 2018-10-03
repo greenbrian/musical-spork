@@ -79,10 +79,8 @@ advertise {
 consul {
   address        = "127.0.0.1:8500"
   auto_advertise = true
-
   client_service_name = "nomad-client"
   client_auto_join    = true
-
   server_service_name = "nomad-server"
   server_auto_join    = true
 }
@@ -90,7 +88,6 @@ consul {
 client {
   enabled         = true
   client_max_port = 15000
-
   options {
     "docker.cleanup.image"   = "0"
     "driver.raw_exec.enable" = "1"
@@ -104,11 +101,31 @@ vault {
 }	
 EOF
 
+cat <<VAULT-AGENT>> /etc/vault-agent.d/vault-agent.hcl
+pid_file = "/var/run.vault-agent.pid"
+auto_auth {
+  method "aws" {
+    mount_path = "auth/aws"
+    config     = {
+      type     = "iam"
+      role     = "nomad"
+      }
+  }
+  sink "file" {
+    wrap_ttl = "5m"
+    config   = {
+      path   = "/mnt/ramdisk/token"
+    }
+  }
+}
+VAULT-AGENT
+
+
 # start nomad once it is configured correctly
 systemctl start nomad.service --no-block
 
-# start vault secure intro
-systemctl start nomad-token-secure-intro.service --no-block
+# start vault agent secure intro
+systemctl start vault-agent.service --no-block
 
 # currently no additional configuration required for vault
 # todo: support TLS in hashistack and pass in {vault_use_tls} once available
