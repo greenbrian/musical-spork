@@ -1,10 +1,10 @@
 [Unit]
 Description=Nomad Agent
-Requires=consul-online.target nomad-token-secure-intro.service
-After=consul-online.target nomad-token-secure-intro.service
+Requires=consul-online.target vault-agent.service
+After=consul-online.target vault-agent.service
 
 [Service]
-EnvironmentFile=-/secrets/nomad-server-token
+EnvironmentFile=-/mnt/ramdisk/token
 PermissionsStartOnly=true
 Restart=on-failure
 ExecStart=/usr/local/bin/nomad agent -config /etc/nomad.d

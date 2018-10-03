@@ -37,16 +37,25 @@ install_from_zip() {
     sudo chmod +x "/usr/local/bin/${1}"
     rm -rf "${1}.zip"
   }
- 
+}
+
+echo "Configuring HashiCorp directories"
+directory_setup() {
   # create and manage permissions on directories
   sudo mkdir -pm 0755 /etc/${1}.d /opt/${1}/data /opt/${1}/tls
   sudo chown -R ${1}:${1} /etc/${1}.d /opt/${1}/data /opt/${1}/tls
   sudo chmod -R 0644 /etc/${1}.d/*
 }
+
 install_from_zip consul
 install_from_zip consul-template
 install_from_zip nomad
 install_from_zip vault
+directory_setup consul
+directory_setup consul-template
+directory_setup nomad
+directory_setup vault
+directory_setup vault-agent
 
 
 echo "Copy systemd services"
@@ -71,6 +80,7 @@ systemd_files consul-online.service ${SYSTEMD_DIR}
 systemd_files consul-online.target ${SYSTEMD_DIR}
 systemd_files nomad.service ${SYSTEMD_DIR}
 systemd_files vault.service ${SYSTEMD_DIR}
+systemd_files vault-agent.service ${SYSTEMD_DIR}
 systemd_files nomad-token-secure-intro.service ${SYSTEMD_DIR}
 
 sudo cp /tmp/files/consul-online.sh /usr/bin/consul-online.sh
@@ -107,4 +117,10 @@ echo "Allow consul sudo access for echo, tee, cat, sed, and systemctl"
 cat <<SUDOERS | sudo tee /etc/sudoers.d/consul
 consul ALL=(ALL) NOPASSWD: /usr/bin/echo, /usr/bin/tee, /usr/bin/cat, /usr/bin/sed, /usr/bin/systemctl, /bin/systemctl
 SUDOERS
+
+echo "Setup ramdisk for Vault token sink"
+mkdir /mnt/ramdisk
+cat <<FSTAB | sudo tee /etc/fstab
+tmpfs       /mnt/ramdisk tmpfs   nodev,nosuid,noexec,nodiratime,size=20M   0 0
+FSTAB
 

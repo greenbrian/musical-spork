@@ -18,7 +18,7 @@ sudo python get-pip.py
 sudo pip install awscli
 echo "Adding Consul and Vault system users"
   # RHEL user setup
-for _user in consul consul-template vault; do
+for _user in consul consul-template vault vault-agent; do
   sudo /usr/sbin/groupadd --force --system ${_user}
   if ! getent passwd ${_user} >/dev/null ; then
     sudo /usr/sbin/adduser \
