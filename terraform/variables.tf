@@ -32,17 +32,17 @@ variable "vault_auto_replication_setup" {
 }
 
 variable "operating_system" {
-  default     = "rhel"
-  description = "Operating system type, supported options are rhel and ubuntu"
+  default     = "centos"
+  description = "Operating system type, supported options are rhel, centos, and ubuntu"
 }
 
 variable "operating_system_version" {
-  default     = "7.5"
-  description = "Operating system version, supported options are 7.3 for rhel, 16.04 for ubuntu"
+  default     = "7"
+  description = "Operating system version, supported options are 7.5 for rhel, 7 for CentOS, 16.04/18.04 for ubuntu"
 }
 
 variable "ssh_user_name" {
-  default     = "ec2-user"
+  default     = "centos"
   description = "Default ssh username for provisioning, ec2-user for rhel systems, ubuntu for ubuntu systems"
 }
 

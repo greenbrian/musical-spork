@@ -40,6 +40,7 @@ resource "aws_instance" "client" {
   iam_instance_profile        = "${var.instance_profile}"
 
   tags {
+    Name             = "${var.cluster_name} - client"
     Environment-Name = "${var.environment_name}"
     role             = "client"
     owner            = "${var.owner}"

@@ -6,7 +6,6 @@ variable "environment_name" {}
 variable "cluster_name" {}
 variable "region" {}
 variable "instance_profile" {}
-variable "kms_id" {}
 variable "owner" {}
 variable "ttl" {}
 variable "image_release" {}
@@ -15,18 +14,9 @@ variable "subnet_ids" {
   type = "list"
 }
 
-variable "public_subnet_ids" {
-  type = "list"
-}
-
-variable "cluster_size" {
-  default     = "3"
-  description = "Number of instances to launch in the cluster"
-}
-
 variable "instance_type" {
-  default     = "t3.large"
-  description = "AWS instance type to use"
+  default     = "t2.micro"
+  description = "AWS instance type to use eg m4.large"
 }
 
 variable "operating_system" {
@@ -36,19 +26,19 @@ variable "operating_system" {
 
 variable "operating_system_version" {
   default     = "7"
-  description = "Operating system version, supported options are 7.5 for rhel, 7 for centos, 16.04/18.04 for ubuntu"
+  description = "Operating system version, supported options are 7.5 for rhel, 7 for CentOS, 16.04/18.04 for ubuntu"
 }
 
 variable "ssh_user_name" {
   default     = "centos"
-  description = "Default ssh username for provisioning, ec2-user for rhel systems, ubuntu for ubuntu systems"
-}
-
-variable "remote_regions" {
-  type = "list"
+  description = "Default ssh username for provisioning, ec2-user for rhel systems, centos for CentOS systems, ubuntu for ubuntu systems"
 }
 
 variable "vanity_domain" {
   default     = "none"
   description = "Vanity domain name to use"
+}
+
+output "db_address" {
+  value = "${var.vanity_domain == "none" ? "${aws_instance.db.public_ip}" : "${element(concat(aws_route53_record.db.*.name, list("")), 0)}"}"
 }

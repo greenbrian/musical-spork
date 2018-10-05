@@ -3,7 +3,7 @@
 instance_id="$(curl -s http://169.254.169.254/latest/meta-data/instance-id)"
 local_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)"
 public_ipv4="$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)"
-new_hostname="hashistack-$${instance_id}"
+new_hostname="hashistack-db-$${public_ipv4}"
 
 echo "${private_key}" > /home/${ssh_user_name}/.ssh/id_rsa
 chmod 0700 /home/${ssh_user_name}/.ssh

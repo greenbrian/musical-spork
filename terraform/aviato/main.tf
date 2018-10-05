@@ -30,7 +30,7 @@ resource "aws_key_pair" "main" {
 
 resource "aws_instance" "haproxy" {
   ami               = "${data.aws_ami.hashistack.id}"
-  instance_type     = "t2.small"
+  instance_type     = "t3.small"
   count             = 1
   subnet_id         = "${var.subnet_ids[0]}"
   key_name          = "${var.ssh_key_name}"
@@ -45,6 +45,7 @@ resource "aws_instance" "haproxy" {
   iam_instance_profile        = "${var.instance_profile}"
 
   tags {
+    Name             = "${var.cluster_name} - haproxy"
     Environment-Name = "${var.environment_name}"
     role             = "haproxy"
     owner            = "${var.owner}"
@@ -87,7 +88,7 @@ resource "aws_security_group" "haproxy" {
 
 resource "aws_instance" "nginx" {
   ami               = "${data.aws_ami.hashistack.id}"
-  instance_type     = "t2.small"
+  instance_type     = "t3.small"
   count             = "${var.nginx_count}"
   subnet_id         = "${var.subnet_ids[0]}"
   key_name          = "${var.ssh_key_name}"
@@ -102,6 +103,7 @@ resource "aws_instance" "nginx" {
   iam_instance_profile        = "${var.instance_profile}"
 
   tags {
+    Name             = "${var.cluster_name} - nginx"
     Environment-Name = "${var.environment_name}"
     role             = "nginx"
     owner            = "${var.owner}"
