@@ -2,9 +2,13 @@ owner    = "John Doe"
 ttl      = "24"
 env_name = "hashistack"
 
-# rhel option
-operating_system           = "rhel"
-operating_system_version   = "7.5"
+# centos option
+operating_system           = "centos"
+operating_system_version   = "7"
+
+# rhel option - additional instance licensing costs
+#operating_system           = "rhel"
+#operating_system_version   = "7.5"
 
 # ubuntu option - work in progress
 #operating_system           = "ubuntu"

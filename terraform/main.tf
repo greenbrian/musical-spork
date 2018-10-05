@@ -82,7 +82,7 @@ module "vpc-west" {
 }
 
 locals {
-  ssh_user_map = "${map("ubuntu","ubuntu","rhel","ec2-user")}"
+  ssh_user_map = "${map("ubuntu","ubuntu","rhel","ec2-user","centos","centos")}"
 }
 
 module "hashistack-us-east" {
@@ -163,6 +163,7 @@ module "client-west" {
   owner                            = "${var.owner}"
   ttl                              = "${var.ttl}"
   region                           = "us-west-2"
+  cluster_name                     = "${random_id.environment_name.hex}-us-west-2"
   environment_name                 = "${random_id.environment_name.hex}"
   ssh_key_name                     = "${random_id.environment_name.hex}-client"
   instance_profile                 = "${module.hashistack-instance-profile.policy}"

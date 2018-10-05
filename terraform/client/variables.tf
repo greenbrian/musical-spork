@@ -8,13 +8,8 @@ variable "region" {}
 variable "instance_profile" {}
 variable "owner" {}
 variable "ttl" {}
-variable "image_release" {}
 
 variable "subnet_ids" {
-  type = "list"
-}
-
-variable "remote_regions" {
   type = "list"
 }
 
@@ -23,22 +18,8 @@ variable "instance_type" {
   description = "AWS instance type to use eg m4.large"
 }
 
-variable "aws_auth_access_key" {
-  type        = "string"
-  description = "AWS access key used by Vault to validate AWS authentication attempts"
-}
-
-variable "aws_auth_secret_key" {
-  type        = "string"
-  description = "AWS secret key used by Vault to validate AWS authentication attempts"
-}
-
 variable "hashistack_instance_arn" {
   description = "AWS IAM role ARN value for Hashistack node"
-}
-
-variable "aviato_instance_arn" {
-  description = "AWS IAM role ARN value for aviato node"
 }
 
 variable "operating_system" {
@@ -56,14 +37,8 @@ variable "ssh_user_name" {
   description = "Default ssh username for provisioning, ec2-user for rhel systems, ubuntu for ubuntu systems"
 }
 
-variable "vault_cloud_auto_init_and_unseal" {
-  type        = "string"
-  description = "Enable or disable automatic Vault initialization and unseal. True or false, string."
-}
-
-variable "vault_auto_replication_setup" {
-  type        = "string"
-  description = "Enable or disable automatic replication configuration between Vault clusters. True or false, string."
+output "ssh_info" {
+  value = "${data.template_file.format_ssh.rendered}"
 }
 
 variable "vanity_domain" {

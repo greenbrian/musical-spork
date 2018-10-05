@@ -56,6 +56,7 @@ resource "aws_instance" "admin" {
   }
 
   tags {
+    Name             = "${var.cluster_name} - admin"
     Environment-Name = "${var.environment_name}"
     role             = "admin"
     owner            = "${var.owner}"

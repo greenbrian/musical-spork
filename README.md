@@ -21,7 +21,10 @@ This contains HashiCorp code to do the following:
 6. Execute Packer build
 ```
 cd packer
-packer build -var-file=vars.json -only=amazon-ebs-rhel-7.5-systemd  packer.json   
+# CentOS 7(default)
+packer build -var-file=vars.json -only=amazon-ebs-centos-7 packer.json   
+# RHEL 7.5 - Additional licensing costs
+packer build -var-file=vars.json -only=amazon-ebs-rhel-7.5-systemd packer.json   
 ```
 
 ## Terraform usage
