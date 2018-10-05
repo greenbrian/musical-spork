@@ -226,7 +226,7 @@
     {
       "type": "shell",
       "script": "scripts/el7.sh",
-      "only": ["amazon-ebs-rhel-7.5-systemd","amazon-ebs-centos7"]
+      "only": ["amazon-ebs-rhel-7.5-systemd","amazon-ebs-centos-7"]
     },
     {
       "type": "shell",

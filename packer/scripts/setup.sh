@@ -10,7 +10,14 @@ sudo curl --silent -Lo /bin/jq https://github.com/stedolan/jq/releases/download/
 sudo chmod +x /bin/jq
 
 echo "Configuring Docker options and service"
-sudo sh -c "echo \"DOCKER_OPTS='--dns 127.0.0.1 --dns 8.8.8.8 --dns-search service.consul'\" >> /etc/default/docker"
+sudo mkdir /etc/docker && sudo chmod 700 /etc/docker
+sudo bash -c "cat >/etc/docker/daemon.json" << EOF
+{
+  "bip": "172.17.0.1/16",
+  "dns": [ "172.17.0.1", "8.8.8.8" ],
+  "dns-search": [ "service.consul" ]
+}
+EOF
 
 sudo systemctl enable docker
 sudo systemctl start docker
