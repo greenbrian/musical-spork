@@ -5,8 +5,11 @@ After=consul-online.target
 
 [Service]
 Restart=on-failure
-ExecStart=/usr/local/bin/vault agent -config /etc/vault-agent.d
-ExecStartPost=/bin/sh -c 'sed -i '1s/^/VAULT_TOKEN=/' /mnt/ramdisk/token'
+PermissionsStartOnly=true
+# need following environment variables as they are not supported in Vault agent config
+Environment=VAULT_ADDR=http://active.vault.service.consul:8200
+Environment=VAULT_SKIP_VERIFY=true
+ExecStart=/usr/local/bin/vault agent -config /etc/vault-agent.d/vault-agent.hcl
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGTERM
 User=vault-agent

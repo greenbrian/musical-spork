@@ -31,7 +31,7 @@ CONSUL-CONFIG
 chown consul:consul /etc/consul.d/consul.hcl
 
 cat <<VAULT-AGENT>> /etc/vault-agent.d/vault-agent.hcl
-pid_file = "/var/run.vault-agent.pid"
+exit_after_auth = true
 auto_auth {
   method "aws" {
     mount_path = "auth/aws"
@@ -48,28 +48,6 @@ auto_auth {
   }
 }
 VAULT-AGENT
-
-cat <<CT-VAULT-SVC>> /etc/systemd/system/consul-template-vault.service
-[Unit]
-Description=consul-template-vault agent
-Requires=consul-online.target vault-agent.service
-After=consul-online.target vault-agent.service
-
-[Service]
-EnvironmentFile=-/mnt/ramdisk/token
-Restart=always
-RestartSec=5
-ExecStart=/usr/local/bin/consul-template -config=/etc/consul-template.d
-KillSignal=SIGINT
-User=root
-Group=root
-
-[Install]
-WantedBy=multi-user.target
-CT-VAULT-SVC
-
-sudo chmod 0664 /etc/systemd/system/aviato-token-secure-intro.service 
-sudo chmod 0664 /etc/systemd/system/consul-template-vault.service
 
 cat <<'NGINX-CONFIG'> /etc/nginx/conf.d/default.conf
 server {
@@ -263,6 +241,3 @@ systemctl enable consul.service
 systemctl start consul
 systemctl enable consul-template-vault.service --no-block
 systemctl start consul-template-vault
-systemctl enable vault-agent.service --no-block
-systemctl start vault-agent
-

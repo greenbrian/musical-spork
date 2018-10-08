@@ -1,21 +1,17 @@
 [Unit]
-Description=Nomad Agent
+Description=consul-template-vault agent
 Requires=consul-online.target
 After=consul-online.target
 
 [Service]
-KillMode=process
-KillSignal=SIGINT
 Environment=VAULT_ADDR=http://active.vault.service.consul:8200
 Environment=VAULT_SKIP_VERIFY=true
 ExecStartPre=/usr/local/bin/vault agent -config /etc/vault-agent.d/vault-agent.hcl
-ExecStart=/usr/bin/nomad-vault.sh
-ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/bin/consul-template-vault.sh
+KillSignal=SIGINT
 Restart=on-failure
 RestartSec=2
 StartLimitBurst=3
 StartLimitIntervalSec=10
-LimitNOFILE=65536
-
-[Install]
-WantedBy=multi-user.target
+User=root
+Group=root

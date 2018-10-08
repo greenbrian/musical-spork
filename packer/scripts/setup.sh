@@ -83,22 +83,16 @@ systemd_files() {
 }
 systemd_files consul.service ${SYSTEMD_DIR}
 systemd_files consul-template.service ${SYSTEMD_DIR}
+systemd_files consul-template-vault.service ${SYSTEMD_DIR}
 systemd_files consul-online.service ${SYSTEMD_DIR}
 systemd_files consul-online.target ${SYSTEMD_DIR}
 systemd_files nomad.service ${SYSTEMD_DIR}
 systemd_files vault.service ${SYSTEMD_DIR}
 systemd_files vault-agent.service ${SYSTEMD_DIR}
-systemd_files nomad-token-secure-intro.service ${SYSTEMD_DIR}
 
 sudo cp /tmp/files/consul-online.sh /usr/bin/consul-online.sh
 sudo chmod +x /usr/bin/consul-online.sh
 sudo systemctl enable consul-online
-
-sudo cp /tmp/files/aws-iam-login.sh /usr/bin/aws-iam-login.sh
-sudo chmod +x /usr/bin/aws-iam-login.sh
-
-sudo cp /tmp/files/aws-iam-login-cleanup.sh /usr/bin/aws-iam-login-cleanup.sh
-sudo chmod +x /usr/bin/aws-iam-login-cleanup.sh
 
 sudo cp /tmp/files/check_mem.sh /usr/bin/check_mem.sh
 sudo chmod +x /usr/bin/check_mem.sh
@@ -108,6 +102,12 @@ sudo chmod +x /usr/bin/check_cpu.sh
 
 sudo cp /tmp/files/vault_setup.sh /usr/bin/vault_setup.sh
 sudo chmod +x /usr/bin/vault_setup.sh
+
+sudo cp /tmp/files/nomad-vault.sh /usr/bin/nomad-vault.sh
+sudo chmod +x /usr/bin/nomad-vault.sh
+
+sudo cp /tmp/files/consul-template-vault.sh /usr/bin/consul-template-vault.sh
+sudo chmod +x /usr/bin/consul-template-vault.sh
 
 echo "Setup Hashistack profile"
 cat <<PROFILE | sudo tee /etc/profile.d/hashistack.sh
@@ -126,8 +126,8 @@ consul ALL=(ALL) NOPASSWD: /usr/bin/echo, /usr/bin/tee, /usr/bin/cat, /usr/bin/s
 SUDOERS
 
 echo "Setup ramdisk for Vault token sink"
-mkdir /mnt/ramdisk
-cat <<FSTAB | sudo tee /etc/fstab
+sudo install -d /mnt/ramdisk --mode=0770 --owner=root --group=vault-agent
+cat <<FSTAB | sudo tee --append /etc/fstab
 tmpfs       /mnt/ramdisk tmpfs   nodev,nosuid,noexec,nodiratime,size=20M   0 0
 FSTAB
 

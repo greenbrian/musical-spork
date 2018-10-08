@@ -102,7 +102,7 @@ vault {
 EOF
 
 cat <<VAULT-AGENT>> /etc/vault-agent.d/vault-agent.hcl
-pid_file = "/var/run.vault-agent.pid"
+exit_after_auth = true
 auto_auth {
   method "aws" {
     mount_path = "auth/aws"
@@ -120,14 +120,7 @@ auto_auth {
 }
 VAULT-AGENT
 
-
 # start nomad once it is configured correctly
 systemctl start nomad.service --no-block
 
-# start vault agent secure intro
-systemctl start vault-agent.service --no-block
-
-# currently no additional configuration required for vault
-# todo: support TLS in hashistack and pass in {vault_use_tls} once available
-# start vault once it is configured correctly
 systemctl start vault
