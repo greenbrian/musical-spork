@@ -30,7 +30,7 @@
       "ssh_timeout": "5m",
       "ami_virtualization_type": "hvm",
       "ami_name": "hashistack-image-rhel-{{isotime \"2006-01-02-03-04\"}}",
-      "ami_description": "HashiStack Image - RHEL 7.5",
+      "ami_description": "{{ user `owner` }}-HashiStack Image - RHEL 7.5",
       "ami_regions": ["us-east-1", "us-east-2", "us-west-2"],
       "tags": {
         "Name": "HashiStack RHEL 7.5 Image {{ user `release_version` }}: Consul v{{ user `consul_version` }} Vault v{{ user `vault_version` }} Nomad v{{ user `nomad_version` }}",
@@ -41,7 +41,8 @@
         "Nomad-Version": "{{ user `nomad_version` }}",
         "OS": "rhel",
         "OS-Version": "7.5",
-        "Release": "{{ user `release` }}"
+        "Release": "{{ user `release` }}",
+        "Owner": "{{ user `owner` }}"
       }
     },
     {
@@ -69,7 +70,7 @@
       "ssh_timeout": "5m",
       "ami_virtualization_type": "hvm",
       "ami_name": "hashistack-image-centos7-{{isotime \"2006-01-02-03-04\"}}",
-      "ami_description": "HashiStack Image - CentOS 7",
+      "ami_description": "{{ user `owner` }}-HashiStack Image - CentOS 7",
       "ami_regions": ["us-east-1", "us-east-2", "us-west-2"],
       "tags": {
         "Name": "HashiStack CentOS 7 Image {{ user `release_version` }}: Consul v{{ user `consul_version` }} Vault v{{ user `vault_version` }} Nomad v{{ user `nomad_version` }}",
@@ -80,7 +81,8 @@
         "Nomad-Version": "{{ user `nomad_version` }}",
         "OS": "centos",
         "OS-Version": "7",
-        "Release": "{{ user `release` }}"
+        "Release": "{{ user `release` }}",
+        "Owner": "{{ user `owner` }}"
       }
     },
     {
@@ -109,7 +111,7 @@
       "ssh_timeout": "10m",
       "ami_virtualization_type": "hvm",
       "ami_name": "hashistack-image-ubuntu-{{isotime \"2006-01-02-03-04\"}}",
-      "ami_description": "HashiStack Image - Ubuntu 18.04",
+      "ami_description": "{{ user `owner` }}-HashiStack Image - Ubuntu 18.04",
       "ami_regions": ["us-east-1", "us-east-2", "us-west-2"],
       "tags": {
         "Name": "HashiStack Ubuntu 18.04 Image Consul v{{ user `consul_version` }} Vault v{{ user `vault_version` }} Nomad v{{ user `nomad_version` }}",
@@ -119,7 +121,9 @@
         "Vault-Version": "{{ user `vault_version` }}",
         "Nomad-Version": "{{ user `nomad_version` }}",
         "OS": "ubuntu",
-        "OS-Version": "18.04"
+        "OS-Version": "18.04",
+        "Release": "{{ user `release` }}",
+        "Owner": "{{ user `owner` }}"
       }
     },
     {
@@ -148,7 +152,7 @@
       "ssh_timeout": "10m",
       "ami_virtualization_type": "hvm",
       "ami_name": "hashistack-image-ubuntu-{{isotime \"2006-01-02-03-04\"}}",
-      "ami_description": "HashiStack Image - Ubuntu 16.04",
+      "ami_description": "{{ user `owner` }}-HashiStack Image - Ubuntu 16.04",
       "ami_regions": ["us-east-1", "us-east-2", "us-west-2"],
       "tags": {
         "Name": "HashiStack Ubuntu 16.04 Image Consul v{{ user `consul_version` }} Vault v{{ user `vault_version` }} Nomad v{{ user `nomad_version` }}",
@@ -158,7 +162,9 @@
         "Vault-Version": "{{ user `vault_version` }}",
         "Nomad-Version": "{{ user `nomad_version` }}",
         "OS": "ubuntu",
-        "OS-Version": "16.04"
+        "OS-Version": "16.04",
+        "Release": "{{ user `release` }}",
+        "Owner": "{{ user `owner` }}"
       }
     }
   ],
