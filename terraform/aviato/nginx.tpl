@@ -30,47 +30,24 @@ enable_script_checks = true
 CONSUL-CONFIG
 chown consul:consul /etc/consul.d/consul.hcl
 
-cat <<AVIATO-SERVICE>> /etc/systemd/system/aviato-token-secure-intro.service
-[Unit]
-Description=Vault AWS IAM login to retrieve aviato specific Vault token
-Requires=consul-online.target 
-After=consul-online.target 
-
-[Service]
-Type=oneshot
-Environment="IAM_ROLE_NAME=aviato"
-Environment="VAULT_TOKEN_FILE_PATH=/secrets"
-Environment="VAULT_TOKEN_FILE=/secrets/aviato"
-ExecStart=/usr/bin/aws-iam-login.sh
-RemainAfterExit=true
-ExecStop=/usr/bin/aws-iam-login-cleanup.sh
-StandardOutput=journal
-
-[Install]
-WantedBy=multi-user.target
-AVIATO-SERVICE
-
-cat <<CT-VAULT-SVC>> /etc/systemd/system/consul-template-vault.service
-[Unit]
-Description=consul-template-vault agent
-Requires=consul-online.target aviato-token-secure-intro.service
-After=consul-online.target aviato-token-secure-intro.service
-
-[Service]
-EnvironmentFile=-/secrets/aviato
-Restart=always
-RestartSec=5
-ExecStart=/usr/local/bin/consul-template -config=/etc/consul-template.d
-KillSignal=SIGINT
-User=root
-Group=root
-
-[Install]
-WantedBy=multi-user.target
-CT-VAULT-SVC
-
-sudo chmod 0664 /etc/systemd/system/aviato-token-secure-intro.service 
-sudo chmod 0664 /etc/systemd/system/consul-template-vault.service
+cat <<VAULT-AGENT>> /etc/vault-agent.d/vault-agent.hcl
+exit_after_auth = true
+auto_auth {
+  method "aws" {
+    mount_path = "auth/aws"
+    config     = {
+      type     = "iam"
+      role     = "aviato"
+      }
+  }
+  sink "file" {
+    wrap_ttl = "5m"
+    config   = {
+      path   = "/mnt/ramdisk/token"
+    }
+  }
+}
+VAULT-AGENT
 
 cat <<'NGINX-CONFIG'> /etc/nginx/conf.d/default.conf
 server {
@@ -264,6 +241,3 @@ systemctl enable consul.service
 systemctl start consul
 systemctl enable consul-template-vault.service --no-block
 systemctl start consul-template-vault
-systemctl enable aviato-token-secure-intro.service --no-block
-systemctl start aviato-token-secure-intro
-

@@ -116,10 +116,8 @@ if [ "${vault_cloud_auto_init_and_unseal}" = true ] ; then
     done
   fi
 fi
-
 export VAULT_ADDR="http://active.vault.service.consul:8200"
 export VAULT_TOKEN=$(cat /tmp/${local_region}-root-token)
-
 export SSH_USER=${ssh_user_name}
 export ENVIRONMENT_NAME=${environment_name}
 export LOCAL_REGION=${local_region}

@@ -44,16 +44,25 @@ install_from_zip() {
     sudo chmod +x "/usr/local/bin/${1}"
     rm -rf "${1}.zip"
   }
- 
+}
+
+echo "Configuring HashiCorp directories"
+directory_setup() {
   # create and manage permissions on directories
   sudo mkdir -pm 0755 /etc/${1}.d /opt/${1}/data /opt/${1}/tls
   sudo chown -R ${1}:${1} /etc/${1}.d /opt/${1}/data /opt/${1}/tls
   sudo chmod -R 0644 /etc/${1}.d/*
 }
+
 install_from_zip consul
 install_from_zip consul-template
 install_from_zip nomad
 install_from_zip vault
+directory_setup consul
+directory_setup consul-template
+directory_setup nomad
+directory_setup vault
+directory_setup vault-agent
 
 
 echo "Copy systemd services"
@@ -74,21 +83,16 @@ systemd_files() {
 }
 systemd_files consul.service ${SYSTEMD_DIR}
 systemd_files consul-template.service ${SYSTEMD_DIR}
+systemd_files consul-template-vault.service ${SYSTEMD_DIR}
 systemd_files consul-online.service ${SYSTEMD_DIR}
 systemd_files consul-online.target ${SYSTEMD_DIR}
 systemd_files nomad.service ${SYSTEMD_DIR}
 systemd_files vault.service ${SYSTEMD_DIR}
-systemd_files nomad-token-secure-intro.service ${SYSTEMD_DIR}
+systemd_files vault-agent.service ${SYSTEMD_DIR}
 
 sudo cp /tmp/files/consul-online.sh /usr/bin/consul-online.sh
 sudo chmod +x /usr/bin/consul-online.sh
 sudo systemctl enable consul-online
-
-sudo cp /tmp/files/aws-iam-login.sh /usr/bin/aws-iam-login.sh
-sudo chmod +x /usr/bin/aws-iam-login.sh
-
-sudo cp /tmp/files/aws-iam-login-cleanup.sh /usr/bin/aws-iam-login-cleanup.sh
-sudo chmod +x /usr/bin/aws-iam-login-cleanup.sh
 
 sudo cp /tmp/files/check_mem.sh /usr/bin/check_mem.sh
 sudo chmod +x /usr/bin/check_mem.sh
@@ -98,6 +102,12 @@ sudo chmod +x /usr/bin/check_cpu.sh
 
 sudo cp /tmp/files/vault_setup.sh /usr/bin/vault_setup.sh
 sudo chmod +x /usr/bin/vault_setup.sh
+
+sudo cp /tmp/files/nomad-vault.sh /usr/bin/nomad-vault.sh
+sudo chmod +x /usr/bin/nomad-vault.sh
+
+sudo cp /tmp/files/consul-template-vault.sh /usr/bin/consul-template-vault.sh
+sudo chmod +x /usr/bin/consul-template-vault.sh
 
 echo "Setup Hashistack profile"
 cat <<PROFILE | sudo tee /etc/profile.d/hashistack.sh
@@ -114,4 +124,10 @@ echo "Allow consul sudo access for echo, tee, cat, sed, and systemctl"
 cat <<SUDOERS | sudo tee /etc/sudoers.d/consul
 consul ALL=(ALL) NOPASSWD: /usr/bin/echo, /usr/bin/tee, /usr/bin/cat, /usr/bin/sed, /usr/bin/systemctl, /bin/systemctl
 SUDOERS
+
+echo "Setup ramdisk for Vault token sink"
+sudo install -d /mnt/ramdisk --mode=0770 --owner=root --group=vault-agent
+cat <<FSTAB | sudo tee --append /etc/fstab
+tmpfs       /mnt/ramdisk tmpfs   nodev,nosuid,noexec,nodiratime,size=20M   0 0
+FSTAB
 
