@@ -25,8 +25,8 @@
 Start the nomad applications in each region from the admin node(top terminal in the diagram above).<br>
 
 ```
-cd ~/nomad/application-deployment/nginx-pquery
-nomad job run profit-us-east-1.hcl
+cd ~/nomad/application-deployment/nginx-pquery && \
+nomad job run profit-us-east-1.hcl && \
 nomad job run profit-us-west-2.hcl
 ```
 
@@ -281,6 +281,7 @@ For a deeper dive into prepared queries you can go down the variations of prepar
 watch -n 1 curl -s http://profityellow.query.consul:8080
 watch -n 1 curl -s http://profitmagenta.query.consul:8080
 watch -n 1 dig profitnearby.query.consul
+watch -n 1 dig profitapp.query.consul
 ```
 
 
