@@ -22,7 +22,7 @@
 ```
 
 
-Start the nomad applications in each region from the admin node.<br>
+Start the nomad applications in each region from the admin node(top terminal in the diagram above).<br>
 
 ```
 cd ~/nomad/application-deployment/nginx-pquery
@@ -30,7 +30,7 @@ nomad job run profit-us-east-1.hcl
 nomad job run profit-us-west-2.hcl
 ```
 
-Execute this from the client node in each region(or the admin node in the admin region).  The client/admin node is important because if you issue the request from a node who is running the service it will always choose the local service which makes the demo slightly less impressive.
+Execute the below cURL watch command from the bottom terminals in the terminal diagram(client in us-west-2 and admin in us-east-1).  The client/admin node is important because if you issue the request from a node who is running the service it will always choose the local service which makes the demo slightly less impressive.
 
 ```
 watch -n 1 curl -s http://profitapp.query.consul:8080
