@@ -1,16 +1,101 @@
-Start the nomad applications in each region.<br>
+```
+                  Demo Terminals
+
++-------------------------------------------------+
+|                                                 |
+|                                                 |
+|                                                 |
+|                  us-east-admin                  |
+|                                                 |
+|                                                 |
+|                                                 |
++------------------------+------------------------+
+|                        |                        |
+|                        |                        |
+|                        |                        |
+|                        |                        |
+|     us-west-client     |     us-east-admin      |
+|                        |                        |
+|                        |                        |
+|                        |                        |
++------------------------+------------------------+
+```
+
+
+Start the nomad applications in each region from the admin node(top terminal in the diagram above).<br>
 
 ```
-nomad job run profit-us-east-1.hcl
+cd ~/nomad/application-deployment/nginx-pquery && \
+nomad job run profit-us-east-1.hcl && \
 nomad job run profit-us-west-2.hcl
 ```
 
-Execute this from the client node in each region(or the admin node in the admin region).  The client/admin node is important because if you issue the request from a node who is running the service it will always choose the local service which makes the demo slightly less impressive.
+Execute the below cURL watch command from the bottom terminals in the terminal diagram(client in us-west-2 and admin in us-east-1).  The client/admin node is important because if you issue the request from a node who is running the service it will always choose the local service which makes the demo slightly less impressive.
 
 ```
 watch -n 1 curl -s http://profitapp.query.consul:8080
 ```
 
+```
+       +-----------------------------------------+
+       |                                         |
+       v                                         |
+  +----------+                                   |
+  |          |   +----------------------+   +---------+
+  |  cURL    +---+profitapp.query.consul+---> DNSMasq |
+  |          |   +----------------------+   +---------+
+  +----------+                                  |  ^
+                                                v  |
+                                           +-----------+
+                                           | Consul    |
+                                           |  Agent    |
+                                           +-----------+
+
+
++---------------------------------------------------------------------------------------------------------+
+|  us-west-2                                         |  us-east-1                                         |
+|                                                    |                                                    |
+| +------------------------------------------------+ | +------------------------------------------------+ |
+| | client                                         | | | admin                                          | |
+| +-------------+                                  | | +-------------+                                  | |
+| ||            |                                  | | ||            |                                  | |
+| ||   cURL     |                                  | | ||   cURL     |                                  | |
+| ||            |                                  | | ||            |                                  | |
+| +-------------+                                  | | +-------------+                                  | |
+| |      |                                         | | |      |                                         | |
+| |      |                                         | | |      |                                         | |
+| |      +--------------------------------+        | | |      +--------------------------------+        | |
+| |      |                |               |        | | |      |                |               |        | |
+| |      |                |               |        | | |      |                |               |        | |
+| +------------------------------------------------+ | +------------------------------------------------+ |
+|        |                |               |          |        |                |               |          |
+|        |                |               |          |        |                |               |          |
+|        |           Nomad|Clients        |          |        |           Nomad|Clients        |          |
+|        v                v               v          |        v                v               v          |
+| +--------------+ +--------------+ +--------------+ | +--------------+ +--------------+ +--------------+ |
+| |--------------| |--------------| |--------------| | |--------------| |--------------| |--------------| |
+| ||   8080     || ||   8080     || ||   8080     || | ||   8080     || ||   8080     || ||   8080     || |
+| || profitapp  || || profitapp  || || profitapp  || | || profitapp  || || profitapp  || || profitapp  || |
+| +--------------+ +--------------+ +--------------+ | +--------------+ +--------------+ +--------------+ |
+| |   Docker     | |   Docker     | |   Docker     | | |   Docker     | |   Docker     | |   Docker     | |
+| +--------------+ +--------------+ +--------------+ | +--------------+ +--------------+ +--------------+ |
+| | |NC | |CC |  | | |NC | |CC |  | | |NC | |CC |  | | | |NC | |CC |  | | |NC | |CC |  | | |NC | |CC |  | |
+| | +---+ +---+  | | +---+ +---+  | | +---+ +---+  | | | +---+ +---+  | | +---+ +---+  | | +---+ +---+  | |
+| +--------------+ +--------------+ +--------------+ | +--------------+ +--------------+ +--------------+ |
+|                                                    |                                                    |
+|                                                    |                                                    |
+|                                                    |                                                    |
+|                                                    |                                                    |
++---------------------------------------------------------------------------------------------------------+
+
+    +-------------------+
+    |                   |
+    | NC = Nomad Client |
+    | CC = Consul Client|
+    |                   |
+    +-------------------+
+
+```
 
 Demonstrate that each region receives local results that rotates through the AZ's and each has unique Vault Tokens and AWS dynamic credentials.
 ```
@@ -18,17 +103,168 @@ nomad job stop -purge -region us-west-2 profit
 ```
 The client in us-west-2 fails over to us-east-1 services.
 
+```
++----------------------------------------------------+----------------------------------------------------+
+|  us-west-2                                         |  us-east-1                                         |
+|                                                    |                                                    |
+| +------------------------------------------------+ | +------------------------------------------------+ |
+| | client                                         | | | admin                                          | |
+| +-------------+                                  | | +-------------+                                  | |
+| ||            |                                  | | ||            |                                  | |
+| ||   cURL     |                                  | | ||   cURL     |                                  | |
+| ||            |                                  | | ||            |                                  | |
+| +----+--------+                                  | | +------+------+                                  | |
+| |    |                                           | | |      |                                         | |
+| |    |                                           | | |      |                                         | |
+| |    |                                           | | |      +----------------+---------------+        | |
+| |    |                                           | | |      |                |               |        | |
+| |    |                                           | | |      |                |               |        | |
+| +------------------------------------------------+ | +------------------------------------------------+ |
+|      |                                             |        |                |               |          |
+|      |                                             |        |                |               |          |
+|      |                                             |        |           Nomad|Clients        |          |
+|      |                                             |        v                v               v          |
+|      |                                             | +--------------+ +--------------+ +--------------+ |
+|      |                                             | |--------------| |--------------| |--------------| |
+|      |                                             | ||   8080     || ||   8080     || ||   8080     || |
+|      |                                             | || profitapp  || || profitapp  || || profitapp  || |
+|      |                                             | +--------------+ +--------------+ +--------------+ |
+|      |                                             | |   Docker     | |   Docker     | |   Docker     | |
+|      |                                             | +-----+-----+--+ +-----+-----+--+ +-----+-----+--+ |
+|      |                                             | | |NC | |CC |  | | |NC | |CC |  | | |NC | |CC |  | |
+|      |                                             | | +---+ +---+  | | +---+ +---+  | | +---+ +---+  | |
+|      |                                             | +------+-------+ +------+-------+ +------+-------+ |
+|      |                                             |        ^                ^                ^         |
+|      |                                             |        |                |                |         |
+|      +------------------------------------------------------+----------------+----------------+         |
+|                                                    |                                                    |
++----------------------------------------------------+----------------------------------------------------+
+```
+
 Bring the service back, and it fails back.
 ```
 nomad job run profit-us-west-2.hcl
 ```
+```
++---------------------------------------------------------------------------------------------------------+
+|  us-west-2                                         |  us-east-1                                         |
+|                                                    |                                                    |
+| +------------------------------------------------+ | +------------------------------------------------+ |
+| | client                                         | | | admin                                          | |
+| +-------------+                                  | | +-------------+                                  | |
+| ||            |                                  | | ||            |                                  | |
+| ||   cURL     |                                  | | ||   cURL     |                                  | |
+| ||            |                                  | | ||            |                                  | |
+| +-------------+                                  | | +-------------+                                  | |
+| |      |                                         | | |      |                                         | |
+| |      |                                         | | |      |                                         | |
+| |      +--------------------------------+        | | |      +--------------------------------+        | |
+| |      |                |               |        | | |      |                |               |        | |
+| |      |                |               |        | | |      |                |               |        | |
+| +------------------------------------------------+ | +------------------------------------------------+ |
+|        |                |               |          |        |                |               |          |
+|        |                |               |          |        |                |               |          |
+|        |           Nomad|Clients        |          |        |           Nomad|Clients        |          |
+|        v                v               v          |        v                v               v          |
+| +--------------+ +--------------+ +--------------+ | +--------------+ +--------------+ +--------------+ |
+| |--------------| |--------------| |--------------| | |--------------| |--------------| |--------------| |
+| ||   8080     || ||   8080     || ||   8080     || | ||   8080     || ||   8080     || ||   8080     || |
+| || profitapp  || || profitapp  || || profitapp  || | || profitapp  || || profitapp  || || profitapp  || |
+| +--------------+ +--------------+ +--------------+ | +--------------+ +--------------+ +--------------+ |
+| |   Docker     | |   Docker     | |   Docker     | | |   Docker     | |   Docker     | |   Docker     | |
+| +--------------+ +--------------+ +--------------+ | +--------------+ +--------------+ +--------------+ |
+| | |NC | |CC |  | | |NC | |CC |  | | |NC | |CC |  | | | |NC | |CC |  | | |NC | |CC |  | | |NC | |CC |  | |
+| | +---+ +---+  | | +---+ +---+  | | +---+ +---+  | | | +---+ +---+  | | +---+ +---+  | | +---+ +---+  | |
+| +--------------+ +--------------+ +--------------+ | +--------------+ +--------------+ +--------------+ |
+|                                                    |                                                    |
+|                                                    |                                                    |
+|                                                    |                                                    |
+|                                                    |                                                    |
++---------------------------------------------------------------------------------------------------------+
+```
+
 Drop the east side and it fails over to west.
 ```
 nomad job stop -purge -region us-east-1 profit
 ```
+```
++----------------------------------------------------+----------------------------------------------------+
+|  us-west-2                                         |  us-east-1                                         |
+|                                                    |                                                    |
+| +------------------------------------------------+ | +------------------------------------------------+ |
+| | client                                         | | | admin                                          | |
+| +-------------+                                  | | +-------------+                                  | |
+| ||            |                                  | | ||            |                                  | |
+| ||   cURL     |                                  | | ||   cURL     |                                  | |
+| ||            |                                  | | ||            |                                  | |
+| +------+------+                                  | | +---+---------+                                  | |
+| |      |                                         | | |   |                                            | |
+| |      |                                         | | |   |                                            | |
+| |      +----------------+---------------+        | | |   |                                            | |
+| |      |                |               |        | | |   |                                            | |
+| |      |                |               |        | | |   |                                            | |
+| +------------------------------------------------+ | +------------------------------------------------+ |
+|        |                |               |          |     |                                              |
+|        |                |               |          |     |                                              |
+|        |           Nomad|Clients        |          |     |                                              |
+|        v                v               v          |     |                                              |
+| +--------------+ +--------------+ +--------------+ |     |                                              |
+| |--------------| |--------------| |--------------| |     |                                              |
+| ||   8080     || ||   8080     || ||   8080     || |     |                                              |
+| || profitapp  || || profitapp  || || profitapp  || |     |                                              |
+| +--------------+ +--------------+ +--------------+ |     |                                              |
+| |   Docker     | |   Docker     | |   Docker     | |     |                                              |
+| +-----+-----+--+ +-----+-----+--+ +-----+-----+--+ |     |                                              |
+| | |NC | |CC |  | | |NC | |CC |  | | |NC | |CC |  | |     |                                              |
+| | +---+ +---+  | | +---+ +---+  | | +---+ +---+  | |     |                                              |
+| +--------------+ +------+-------+ +------+-------+ |     |                                              |
+|       ^                 ^                ^         |     |                                              |
+|       |                 |                |         |     |                                              |
+|       +-----------------+----------------+---------------+                                              |
+|                                                    |                                                    |
++----------------------------------------------------+----------------------------------------------------+
+```
+
 Bring it back.
 ```
 nomad job run profit-us-east-1.hcl
+```
+```
++---------------------------------------------------------------------------------------------------------+
+|  us-west-2                                         |  us-east-1                                         |
+|                                                    |                                                    |
+| +------------------------------------------------+ | +------------------------------------------------+ |
+| | client                                         | | | admin                                          | |
+| +-------------+                                  | | +-------------+                                  | |
+| ||            |                                  | | ||            |                                  | |
+| ||   cURL     |                                  | | ||   cURL     |                                  | |
+| ||            |                                  | | ||            |                                  | |
+| +-------------+                                  | | +-------------+                                  | |
+| |      |                                         | | |      |                                         | |
+| |      |                                         | | |      |                                         | |
+| |      +--------------------------------+        | | |      +--------------------------------+        | |
+| |      |                |               |        | | |      |                |               |        | |
+| |      |                |               |        | | |      |                |               |        | |
+| +------------------------------------------------+ | +------------------------------------------------+ |
+|        |                |               |          |        |                |               |          |
+|        |                |               |          |        |                |               |          |
+|        |           Nomad|Clients        |          |        |           Nomad|Clients        |          |
+|        v                v               v          |        v                v               v          |
+| +--------------+ +--------------+ +--------------+ | +--------------+ +--------------+ +--------------+ |
+| |--------------| |--------------| |--------------| | |--------------| |--------------| |--------------| |
+| ||   8080     || ||   8080     || ||   8080     || | ||   8080     || ||   8080     || ||   8080     || |
+| || profitapp  || || profitapp  || || profitapp  || | || profitapp  || || profitapp  || || profitapp  || |
+| +--------------+ +--------------+ +--------------+ | +--------------+ +--------------+ +--------------+ |
+| |   Docker     | |   Docker     | |   Docker     | | |   Docker     | |   Docker     | |   Docker     | |
+| +--------------+ +--------------+ +--------------+ | +--------------+ +--------------+ +--------------+ |
+| | |NC | |CC |  | | |NC | |CC |  | | |NC | |CC |  | | | |NC | |CC |  | | |NC | |CC |  | | |NC | |CC |  | |
+| | +---+ +---+  | | +---+ +---+  | | +---+ +---+  | | | +---+ +---+  | | +---+ +---+  | | +---+ +---+  | |
+| +--------------+ +--------------+ +--------------+ | +--------------+ +--------------+ +--------------+ |
+|                                                    |                                                    |
+|                                                    |                                                    |
+|                                                    |                                                    |
+|                                                    |                                                    |
++---------------------------------------------------------------------------------------------------------+
 ```
 
 If this is a demo showing off consul configuration management or nomad/vault integrations, you can now go in via the consul ui and change one of the fruits for yellow/magenta to pear/grape/etc. and watch as the instances restart and show the new fruit result without interaction.<br>
@@ -40,9 +276,12 @@ kv/service/profitapp/magenta/fruit
 ```
 You can also point out that as the 1minute TTL on the AWS secret is expiring the nodes are restarting and fetching a new secret.  If the TTL were longer it may renew the creds vs. getting fresh ones each time.
 
-For a deeper dive into prepared queries you can go down the variations of prepared queries profityellow/profitmagenta/profitnearby to show tag filtering and sorting results based on RTT from agent. Using dig is nice for the RTT sorting to compare RR DNS results vs. static result order based on RTT.  Currently profitmagenta/profitnearby aren't automatically executed on environment standup so they have to be manually executed for each region.
+For a deeper dive into prepared queries you can go down the variations of prepared queries profityellow/profitmagenta/profitnearby to show tag filtering and sorting results based on RTT from agent. Using dig is nice for the RTT sorting to compare RR DNS results vs. static result order based on RTT.
 ```
 watch -n 1 curl -s http://profityellow.query.consul:8080
+watch -n 1 curl -s http://profitmagenta.query.consul:8080
+watch -n 1 dig profitnearby.query.consul
+watch -n 1 dig profitapp.query.consul
 ```
 
 
@@ -111,7 +350,7 @@ watch -n 1 curl -s http://profityellow.query.consul:8080
       --header "Content-Type: application/json" \
       --request POST \
       --data '{
-                "Name": "profitclose",
+                "Name": "profitnearby",
                 "Service": {
                   "Service": "profitapp",
                   "Failover": {

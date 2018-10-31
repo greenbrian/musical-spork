@@ -29,9 +29,9 @@ curl -sX POST -H "X-Vault-Token: ${VAULT_TOKEN}" \
 echo "Configure AWS credentials in Vault for AWS authentication method"
 curl -sX POST -H "X-Vault-Token: ${VAULT_TOKEN}" \
     http://${LOCAL_ACTIVE_VAULT}:8200/v1/auth/aws/config/client \
-    -d '{ "access_key": "'"${AWS_AUTH_ACCESS_KEY}"'", 
+    -d '{ "access_key": "'"${AWS_AUTH_ACCESS_KEY}"'",
           "secret_key": "'"${AWS_AUTH_SECRET_KEY}"'"}'
-   
+
 echo "Configure AWS role in Vault for AWS authentication method"
 curl -sX POST -H "X-Vault-Token: ${VAULT_TOKEN}" \
     http://${LOCAL_ACTIVE_VAULT}:8200/v1/auth/aws/role/nomad \
@@ -41,7 +41,7 @@ curl -sX POST -H "X-Vault-Token: ${VAULT_TOKEN}" \
           "max_ttl": "500h"
         }'
 
-    
+
 echo "Running Fabio load balancer as Nomad job"
 export NOMAD_ADDR="http://$(curl -s http://127.0.0.1:8500/v1/catalog/service/nomad-server?dc=${LOCAL_REGION} | jq -r '.[0].Address'):4646"
 nomad run /home/$SSH_USER/nomad/fabio-${LOCAL_REGION}.nomad
@@ -223,7 +223,7 @@ echo "
     capabilities = [\"update\"]
   }
   " | vault policy write aviato -
-    
+
 echo "Configure AWS role in Vault for AWS authentication method"
 curl -sX POST -H "X-Vault-Token: ${VAULT_TOKEN}" \
     http://${LOCAL_ACTIVE_VAULT}:8200/v1/auth/aws/role/aviato \
@@ -280,8 +280,8 @@ vault kv put secret/cidr foo=bar
 #sentinel_demo
 
 
-vault --version | grep 0.11 ; if [ $? -eq 0 ] 
-then 
+vault --version | grep 0.11 ; if [ $? -eq 0 ]
+then
   #Namespaces
   vault namespace create engineering
   vault namespace create -namespace=engineering development
@@ -296,8 +296,8 @@ then
   path "secret/" {
     capabilities = ["list"]
   }' | vault policy write user-tmpl -
-  vault write auth/userpass/users/bob password=vault 
-  vault auth list -format=json | jq -r '.["userpass/"].accessor' > accessor.txt  
+  vault write auth/userpass/users/bob password=vault
+  vault auth list -format=json | jq -r '.["userpass/"].accessor' > accessor.txt
   vault write -format=json identity/entity name="bob_smith" policies="user-tmpl" \
           | jq -r ".data.id" > entity_id.txt
   vault write identity/entity-alias name="bob" \
@@ -311,13 +311,12 @@ fi
 # Add Consul Prepared Query Template for Auto Service Failover and scoped query to target tags
 for region in ${LOCAL_REGION} ${REMOTE_REGIONS}; do
   curl -sX POST http://127.0.0.1:8500/v1/query?dc=${region} \
-      -d '{ "Name": "", 
+      -d '{ "Name": "",
               "Template": { "Type": "name_prefix_match" },
-              "Service": { 
+              "Service": {
                 "Service": "${name.full}",
-                "Failover": { "NearestN": 3 }, 
-                "OnlyPassing": true }}' 
-  
+                "Failover": { "NearestN": 3 },
+                "OnlyPassing": true }}'
   curl -sX POST http://127.0.0.1:8500/v1/query?dc=${region} \
        -d '{ "Name": "profityellow",
              "Service" : {
@@ -326,6 +325,25 @@ for region in ${LOCAL_REGION} ${REMOTE_REGIONS}; do
                "OnlyPassing": true,
                "Near": "",
                "Tags": ["profit", "yellow"],
+               "NodeMeta": null },
+             "DNS": { "TTL": "" }}'
+  curl -sX POST http://127.0.0.1:8500/v1/query?dc=${region} \
+       -d '{ "Name": "profitmagenta",
+             "Service" : {
+               "Service": "profitapp",
+               "Failover": { "NearestN": 3 },
+               "OnlyPassing": true,
+               "Near": "",
+               "Tags": ["profit", "magenta"],
+               "NodeMeta": null },
+             "DNS": { "TTL": "" }}'
+  curl -sX POST http://127.0.0.1:8500/v1/query?dc=${region} \
+       -d '{ "Name": "profitnearby",
+             "Service" : {
+               "Service": "profitapp",
+               "Failover": { "NearestN": 3 },
+               "OnlyPassing": true,
+               "Near": "_agent",
                "NodeMeta": null },
              "DNS": { "TTL": "" }}'
 done
