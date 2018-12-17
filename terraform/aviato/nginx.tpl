@@ -103,22 +103,24 @@ services = [
     port = 80
     tags = ["web"]
 
-    checks = [{
-      id       = "GET"
-      args     = ["curl", "localhost", ">/dev/null", "2>&1"]
-      interval = "10s"
-    },
-    {
-      id       = "HTTP-TCP"
-      interval = "10s"
-      tcp      = "localhost:80"
-      timeout  = "1s"
-    },
-    {
-      id       = "OS-Status"
-      args     = ["service", "nginx", "status"]
-      interval = "30s"
-    }
+    checks = [
+      {
+        id       = "GET"
+        args     = ["curl", "localhost", ">/dev/null", "2>&1"]
+        interval = "10s"
+      },
+      {
+        id       = "HTTP-TCP"
+        interval = "10s"
+        tcp      = "localhost:80"
+        timeout  = "1s"
+      },
+      {
+        id       = "OS-Status"
+        args     = ["service", "nginx", "status"]
+        interval = "30s"
+      }
+    ]
   },
   {
     id   = "nginx-ssl"
@@ -126,22 +128,24 @@ services = [
     port = 443
     tags = ["web"]
 
-    checks = [{
-      id       = "GET"
-      args     = ["curl", "localhost", ">/dev/null", "2>&1"]
-      interval = "10s"
-    },
-    {
-      id       = "HTTPS-TCP"
-      interval = "10s"
-      tcp      = "localhost:443"
-      timeout  = "1s"
-    },
-    {
-      id       = "OS-Status"
-      args     = ["service", "nginx", "status"]
-      interval = "30s"
-    }
+    checks = [
+      {
+        id       = "GET"
+        args     = ["curl", "localhost", ">/dev/null", "2>&1"]
+        interval = "10s"
+      },
+      {
+        id       = "HTTPS-TCP"
+        interval = "10s"
+        tcp      = "localhost:443"
+        timeout  = "1s"
+      },
+      {
+        id       = "OS-Status"
+        args     = ["service", "nginx", "status"]
+        interval = "30s"
+      }
+    ]      
 }]
 
 checks = [
