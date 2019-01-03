@@ -13,7 +13,6 @@ This contains HashiCorp code to do the following:
 - User possesses AWS account and credentials
 
 # Enterprise Demo Setup
-up
 
 ## Step 1: Use Packer to build AMIs
 0. change to the packer directory `packer/`
@@ -32,8 +31,8 @@ packer build -var-file=vars.json -only=amazon-ebs-centos-7 packer.json
 packer build -var-file=vars.json -only=amazon-ebs-rhel-7.5-systemd packer.json   
 ```
 
-## Terraform Enterprise Setup 
-TFE URL: app.terraform.io
+## Step 2: Terraform Enterprise  
+[TFE URL](app.terraform.io). This setup assumes you have a TFE SaaS account and a VCS connection setup. You could also push the code up via the enhanced remote backend, TFE-CLI, or API.
 
 0. [Create a workspace](https://www.terraform.io/docs/enterprise/workspaces/creating.html) in TFE for musical-spork. I'm calling it the "Hashi-Stack" here for demo purposes. (Note the workspace settings from the below image)
 
@@ -49,13 +48,13 @@ TFE URL: app.terraform.io
 
 ![](https://raw.githubusercontent.com/Andrew-Klaas/musical-spork/master/assets/sentinel_policy.png)
 
-3. Queue a terraform plan. Show plan and policy check results. The demo is around 140 resources at this time of writing. Your policy checks will most likely differ :).
+3. Queue a terraform plan. Show plan and policy check results. The demo is around 140 resources at the time of writing. Your policy checks will most likely differ :).
 
 ![](https://raw.githubusercontent.com/Andrew-Klaas/musical-spork/master/assets/plan.png)
 
 
 4. Run Apply
-5. Next steps: See following links for Business value demo walkthroughs. [TODO LINK](). You will use the terraform output from this workspace for your demos.
+5. Next steps: See following links for business value demo walkthroughs. [TODO LINK](). You will use the terraform output from this workspace for your demos.
 
 
 
