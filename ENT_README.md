@@ -15,6 +15,8 @@ This contains HashiCorp code to do the following:
 # Enterprise Demo Setup
 
 ## Step 1: Use Packer to build AMIs
+This is most likely optional as Terraform will automatically pull the latest hashi-stack AMIs from our account.
+
 0. change to the packer directory `packer/`
 1. Download Consul, Nomad, and Vault binaries locally (Vault enterprise required, Consul and Nomad Enterprise )
 2. Copy packer/vars.json.example to packer/vars.json
@@ -39,7 +41,7 @@ packer build -var-file=vars.json -only=amazon-ebs-rhel-7.5-systemd packer.json
 ![](https://raw.githubusercontent.com/Andrew-Klaas/musical-spork/master/assets/create_workspace.png)
 
 1. [Configure variables
-](https://www.terraform.io/docs/enterprise/workspaces/variables.html) for the workspace. I'm doing it via the GUI here.
+](https://www.terraform.io/docs/enterprise/workspaces/variables.html) for the workspace. I'm doing it via the GUI here. Note: add the `CONFIRM_DESTROY = 1` environment variable as well so you can destroy the workspace.
 
 ![](https://raw.githubusercontent.com/Andrew-Klaas/musical-spork/master/assets/configure_variables.png)
 
@@ -54,7 +56,21 @@ packer build -var-file=vars.json -only=amazon-ebs-rhel-7.5-systemd packer.json
 
 
 4. Run Apply
-5. Next steps: See following links for business value demo walkthroughs. [TODO LINK](). You will use the terraform output from this workspace for your demos.
+
+## Step 3: Business Value Demos
+[TODO LINK](). You will use the terraform output from this workspace for your demos.
+
+
+## Step 4: Auto Shutdown, TFE Workspace Reaper
+Finally, automate the automatic deltion of your demo environment via Adam's [TFE Workspace Reaper](https://github.com/AdamCavaliere/TFE_WorkspaceReaper/).
+
+1. Fork the above repo
+2. Create a workspace in TFE linked to said repo
+3. Populate proper envionment variables (Use TFE Team or proper User API Token)
+
+![](https://raw.githubusercontent.com/Andrew-Klaas/musical-spork/master/assets/workspace_reaper_vars.png)
+
+4. For the TFE workspaces you want reaped, set "WORKSPACE_TTL" environment variable to an integer (in minutes) time to live.
 
 
 
