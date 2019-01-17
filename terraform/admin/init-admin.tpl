@@ -37,14 +37,14 @@ systemctl daemon-reload
 while [ "x$${consul_leader_http_code}" != "x200" ] ; do
   echo "Waiting for Consul to get a leader..."
   sleep 5
-  consul_leader_http_code=$(curl --silent --output /dev/null --write-out "%{http_code}" "http://127.0.0.1:8500/v1/operator/raft/configuration") || consul_leader_http_code=""
+  consul_leader_http_code=$(curl --silent --output /dev/null --write-out "%%{http_code}" "http://127.0.0.1:8500/v1/operator/raft/configuration") || consul_leader_http_code=""
 done
 
 for region in ${remote_regions}; do
   while [ "x$${wan_consul_leader_http_code}" != "x200" ] ; do
     echo "Waiting for Consul WAN join to $${region} to complete..."
     sleep 5
-    wan_consul_leader_http_code=$(curl --silent --output /dev/null --write-out "%{http_code}" "http://127.0.0.1:8500/v1/operator/raft/configuration?dc=$${region}") || consul_leader_http_code=""
+    wan_consul_leader_http_code=$(curl --silent --output /dev/null --write-out "%%{http_code}" "http://127.0.0.1:8500/v1/operator/raft/configuration?dc=$${region}") || consul_leader_http_code=""
   done
 done
 
