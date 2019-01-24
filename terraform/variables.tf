@@ -50,3 +50,13 @@ variable "root_domain" {
   default     = "none"
   description = "Domain to use for vanity demos"
 }
+
+variable "vault_cloud_unseal" {
+  default     = "true"
+  description = "Enable Vault Cloud unseal"
+}
+
+variable "nomad_enabled" {
+  default     = "true"
+  description = "Enable using Nomad"
+}
