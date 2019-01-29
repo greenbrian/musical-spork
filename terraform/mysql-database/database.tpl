@@ -41,6 +41,14 @@ cat <<EOF>> /etc/consul.d/consul.json
 EOF
 chown consul:consul /etc/consul.d/consul.json
 
+cat <<EOF>> /etc/yum.repos.d/MariaDB.repo
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.3/centos7-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+EOF
+
 
 # Detect package management system.
 YUM=$(which yum 2>/dev/null)
