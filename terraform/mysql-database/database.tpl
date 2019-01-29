@@ -69,6 +69,7 @@ sudo mysqladmin -u root password R00tPassword
 sudo mysql -u root -p'R00tPassword' << EOF
 GRANT ALL PRIVILEGES ON *.* TO 'vaultadmin'@'%' IDENTIFIED BY 'vaultadminpassword' WITH GRANT OPTION;
 CREATE DATABASE app;
+CREATE DATABASE my_app;
 FLUSH PRIVILEGES;
 EOF
 sudo sed -i 's/bind-address/#bind-address/g' /etc/mysql/mariadb.conf.d/50-server.cnf
