@@ -7,6 +7,11 @@ The application and deployed image are built via this repository: https://github
 
 ## Steps (Fabio)
 
+First SSH into the admin node (found via Terraform output)
+```bash
+admin-ssh-us-east-1 = connect to host with following command: ssh ec2-user@3.93.54.250 -i private_key.pem
+```
+
 Run the following commands from the musical-spork admin node
 
 ```bash
