@@ -5,7 +5,13 @@ This example demonstrates the Vault Transit secret engine with a python applicat
 
 The application and deployed image are built via this repository: https://github.com/AdamCavaliere/transit-app-example
 
-## Steps (Fabio)
+## Access the Transit App (Terraform automatically deployed)
+Open the URL from your terraform output:
+```bash
+vault-Transit-App-Demo = http://ak-hashistack-fe79aebb-fabio-4155744d59671ccd.elb.us-east-1.amazonaws.com:9999
+```
+
+## Manual Steps (Fabio)
 
 First SSH into the admin node (found via Terraform output)
 ```bash
