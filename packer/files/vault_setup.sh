@@ -371,8 +371,8 @@ vault write lob_a/workshop/database/config/ws-mysql-database \
     plugin_name=mysql-database-plugin \
     connection_url="{{username}}:{{password}}@tcp(db.service.consul:3306)/" \
     allowed_roles="workshop-app" \
-    username="root" \
-    password="root"
+    username="vaultadmin" \
+    password="vaultadminpassword"
 
 # Create our role
 vault write lob_a/workshop/database/roles/workshop-app-long \
