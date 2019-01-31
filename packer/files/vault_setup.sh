@@ -361,7 +361,7 @@ curl -sfX DELETE  http://127.0.0.1:8500/v1/kv/service/vault?recurse
 #################################
 # Transit-app-example Vault setup
 #################################
-vault auth -method=userpass username=vault password=vault
+vault login -method=userpass username=vault password=vault
 
 # Enable our secret engine
 vault secrets enable -path=lob_a/workshop/database database

@@ -39,7 +39,7 @@ job "transit-app-example" {
                 DynamicDBCreds = False
                 ProtectRecords=False
                 Address=http://vault.service.consul:8200
-                Token=root
+                Token=
                 KeyPath=lob_a/workshop/transit
                 KeyName=customer-key
                 EOH

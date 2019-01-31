@@ -156,6 +156,7 @@ module "admin-east" {
   hashistack_instance_arn          = "${module.hashistack-instance-profile.hashistack_instance_arn}"
   aviato_instance_arn              = "${module.aviato-instance-profile.aviato_instance_arn}"
   vanity_domain                    = "${var.root_domain}"
+  launch_nomad_jobs_automatically  = "${var.launch_nomad_jobs_automatically}"
 }
 
 module "client-west" {
