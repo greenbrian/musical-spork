@@ -132,7 +132,7 @@ export AVIATO_INSTANCE_ARN=${aviato_instance_arn}
 ######################
 # Launch Nomad Demos
 ######################
-export NOMAD_ADDR="http://$(curl -s http://127.0.0.1:8500/v1/catalog/service/nomad-server?dc=us-east-1 | jq -r '.[0].Address'):4646"
+export NOMAD_ADDR="http://$(curl -s http://127.0.0.1:8500/v1/catalog/service/nomad-server?dc=${local_region} | jq -r '.[0].Address'):4646"
 YUM=$(which yum 2>/dev/null)
 if [ "${launch_nomad_jobs_automatically}" = true ] ; then
   if [[ ! -z $${YUM} ]]; then
