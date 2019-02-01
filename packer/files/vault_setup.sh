@@ -394,7 +394,7 @@ vault write -f lob_a/workshop/transit/keys/archive-key
 #Create Vault policy used by Nomad job 
 cat << EOF > transit-app-example.policy
 path "lob_a/workshop/database/creds/workshop-app" {
-    capabilities = ["read", "list"]
+    capabilities = ["read", "list", "create", "update"]
 }
 path "lob_a/workshop/transit/*" {
     capabilities = ["read", "list", "create", "update"]
