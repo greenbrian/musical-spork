@@ -70,3 +70,9 @@ variable "vanity_domain" {
   default     = "none"
   description = "Vanity domain name to use"
 }
+
+variable "launch_nomad_jobs_automatically" {
+  type        = "string"
+  default     = "true"
+  description = "Enable or disable automatic Nomad deployment of Fabio and other demo applications"
+}
