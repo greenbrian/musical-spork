@@ -50,3 +50,9 @@ variable "root_domain" {
   default     = "none"
   description = "Domain to use for vanity demos"
 }
+
+variable "launch_nomad_jobs_automatically" {
+  type        = "string" 
+  default     = "true"
+  description = "Enable or disable automatic Nomad deployment of Fabio and other demo applications"
+}

@@ -81,6 +81,7 @@ data "template_file" "admin" {
     aws_auth_secret_key              = "${var.aws_auth_secret_key}"
     hashistack_instance_arn          = "${var.hashistack_instance_arn}"
     aviato_instance_arn              = "${var.aviato_instance_arn}"
+    launch_nomad_jobs_automatically  = "${var.launch_nomad_jobs_automatically}"
   }
 }
 

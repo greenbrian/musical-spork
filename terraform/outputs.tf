@@ -77,3 +77,7 @@ output "ssh_key_name" {
 output "public_key_data" {
   value = "${module.ssh.public_key_data}"
 }
+
+output "vault-Transit-App-Demo" {
+  value = "${module.hashistack-us-east.fabio-router}"
+}

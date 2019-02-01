@@ -127,3 +127,20 @@ export AWS_AUTH_SECRET_KEY=${aws_auth_secret_key}
 export HASHISTACK_INSTANCE_ARN=${hashistack_instance_arn}
 export AVIATO_INSTANCE_ARN=${aviato_instance_arn}
 /usr/bin/vault_setup.sh
+
+
+######################
+# Launch Nomad Demos
+######################
+export NOMAD_ADDR="http://$(curl -s http://127.0.0.1:8500/v1/catalog/service/nomad-server?dc=${local_region} | jq -r '.[0].Address'):4646"
+YUM=$(which yum 2>/dev/null)
+if [ "${launch_nomad_jobs_automatically}" = true ] ; then
+  if [[ ! -z $${YUM} ]]; then
+    /usr/local/bin/nomad run /home/ec2-user/nomad/fabio-us-east-1.nomad
+    /usr/local/bin/nomad run /home/ec2-user/nomad/application-deployment/transit-app-example/transit-app-example.nomad
+  else 
+    /usr/local/bin/nomad run /home/ubuntu/nomad/fabio-us-east-1.nomad
+    /usr/local/bin/nomad run /home/ubuntu/nomad/application-deployment/transit-app-example/transit-app-example.nomad
+  fi
+fi
+
