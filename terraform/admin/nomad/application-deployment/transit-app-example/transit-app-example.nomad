@@ -41,8 +41,8 @@ job "transit-app-example" {
                 Token=
                 KeyPath=lob_a/workshop/transit
                 KeyName=customer-key
-       		DynamicDBCreds = true
-       		DynamicDBCredsPath = lob_a/workshop/database/creds/workshop-app
+                DynamicDBCreds = true
+                DynamicDBCredsPath = lob_a/workshop/database/creds/workshop-app
                 EOH
                 destination = "local/config.ini"
             }
