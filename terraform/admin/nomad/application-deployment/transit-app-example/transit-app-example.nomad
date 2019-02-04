@@ -25,7 +25,7 @@ job "transit-app-example" {
             template {
                 data = <<EOH
                 [DEFAULT]
-                LogLevel = WARN
+                LogLevel = DEBUG
 
                 [DATABASE]
                 Address=db.service.consul
@@ -36,12 +36,13 @@ job "transit-app-example" {
 
                 [VAULT]
                 Enabled = True
-                DynamicDBCreds = False
                 ProtectRecords=False
                 Address=http://vault.service.consul:8200
                 Token=
                 KeyPath=lob_a/workshop/transit
                 KeyName=customer-key
+           		DynamicDBCreds = true
+           		DynamicDBCredsPath = lob_a/workshop/database/creds/workshop-app
                 EOH
                 destination = "local/config.ini"
             }
