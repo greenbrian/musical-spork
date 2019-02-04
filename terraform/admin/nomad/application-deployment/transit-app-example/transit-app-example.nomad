@@ -2,7 +2,6 @@ job "transit-app-example" {
     datacenters = ["us-east-1a", "us-east-1b", "us-east-1c"]
     type = "service"
     update {
-      stagger = "5s"
       max_parallel = 1
     }
     group "transit-app-example" {
@@ -10,12 +9,17 @@ job "transit-app-example" {
             operator = "distinct_hosts"
             value = "true"
         }
-        count = 1
+        restart {
+            attempts = 3
+            delay = "5s"
+	}
+        count = 3
         task "transit-app-example" {
 
             driver = "docker"
             config {
-                image = "airedale/transit-demo:token"
+                #image = "airedale/transit-demo:token"
+                image = "aklaas2/transit-app-example:latest"
                 volumes = ["local/config.ini:/usr/src/app/config/config.ini"]
                 network_mode = "host"
                 port_map {
@@ -37,7 +41,7 @@ job "transit-app-example" {
                 [VAULT]
                 Enabled = True
                 ProtectRecords=False
-                Address=http://vault.service.consul:8200
+                Address=http://active.vault.service.consul:8200
                 Token=
                 KeyPath=lob_a/workshop/transit
                 KeyName=customer-key
