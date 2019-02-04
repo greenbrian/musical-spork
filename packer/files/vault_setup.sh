@@ -384,8 +384,8 @@ vault write lob_a/workshop/database/roles/workshop-app-long \
 vault write lob_a/workshop/database/roles/workshop-app \
     db_name=ws-mysql-database \
     creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT ALL ON *.* TO '{{name}}'@'%';" \
-    default_ttl="5m" \
-    max_ttl="1h"
+    default_ttl="30m" \
+    max_ttl="24h"
 
 vault secrets enable -path=lob_a/workshop/transit transit
 vault write -f lob_a/workshop/transit/keys/customer-key
@@ -394,10 +394,10 @@ vault write -f lob_a/workshop/transit/keys/archive-key
 #Create Vault policy used by Nomad job 
 cat << EOF > transit-app-example.policy
 path "lob_a/workshop/database/creds/workshop-app" {
-    capabilities = ["read", "list"]
+    capabilities = ["read", "list", "create", "update", "delete"]
 }
 path "lob_a/workshop/transit/*" {
-    capabilities = ["read", "list", "create", "update"]
+    capabilities = ["read", "list", "create", "update", "delete"]
 }
 EOF
 vault policy-write transit-app-example transit-app-example.policy
